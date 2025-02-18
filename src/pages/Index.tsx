@@ -30,9 +30,11 @@ const Index = () => {
           <div className="text-xl font-semibold text-gray-900">Saga</div>
           <nav className="flex items-center gap-4">
             <CustomButton variant="ghost" size="sm">
-              Log in
+              Log In
             </CustomButton>
-            <CustomButton size="sm">Sign up</CustomButton>
+            <CustomButton size="sm">
+              Sign Up
+            </CustomButton>
           </nav>
         </div>
       </header>
@@ -46,7 +48,7 @@ const Index = () => {
               src={image}
               alt=""
               className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
-                currentImageIndex === index ? "opacity-10" : "opacity-0"
+                currentImageIndex === index ? "opacity-30" : "opacity-0"
               }`}
             />
           ))}
@@ -58,10 +60,10 @@ const Index = () => {
             }`}
           >
             <h1 className="mb-6 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-5xl font-bold text-transparent sm:text-6xl">
-              Unlock AI-ready licensed characters
+              Unlock AI-Ready Licensed Characters
             </h1>
             <p className="mb-8 text-lg text-gray-600">
-              Create stunning videos with professional characters, all fully licensed and ready for your AI projects.
+              Create Stunning Videos With Professional Characters, All Fully Licensed And Ready For Your AI Projects.
             </p>
             <div className="flex justify-center">
               <CustomButton size="lg" className="h-14 px-12 text-lg">
