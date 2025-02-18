@@ -30,7 +30,7 @@ export default {
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
+          DEFAULT: "#1A1F2C",
           foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
@@ -83,12 +83,18 @@ export default {
           "0%": { transform: "translateY(100%)" },
           "100%": { transform: "translateY(0)" },
         },
+        "fade-in-out": {
+          "0%": { opacity: "0" },
+          "50%": { opacity: "1" },
+          "100%": { opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         float: "float 6s ease-in-out infinite",
         "text-slide": "text-slide 0.5s ease-out forwards",
+        "fade-in-out": "fade-in-out 5s infinite",
       },
     },
   },

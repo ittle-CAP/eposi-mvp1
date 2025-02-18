@@ -2,13 +2,24 @@
 import { useEffect, useState } from "react";
 import { CustomButton } from "@/components/ui/custom-button";
 import { FeatureCard } from "@/components/feature-card";
-import { Chrome, Github } from "lucide-react";
 
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const backgroundImages = [
+    "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
+    "https://images.unsplash.com/photo-1501286353178-1ec881214838",
+    "https://images.unsplash.com/photo-1466721591366-2d5fba72006d",
+    "https://images.unsplash.com/photo-1438565434616-3ef039228b15"
+  ];
 
   useEffect(() => {
     setIsVisible(true);
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % backgroundImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -28,6 +39,18 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="container relative mx-auto px-4 pt-32 text-center">
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          {backgroundImages.map((image, index) => (
+            <img
+              key={image}
+              src={image}
+              alt=""
+              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
+                currentImageIndex === index ? "opacity-10" : "opacity-0"
+              }`}
+            />
+          ))}
+        </div>
         <div className="mx-auto max-w-3xl">
           <div
             className={`transform transition-all duration-1000 ${
@@ -40,28 +63,10 @@ const Index = () => {
             <p className="mb-8 text-lg text-gray-600">
               Create stunning videos with professional characters, all fully licensed and ready for your AI projects.
             </p>
-            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <CustomButton size="lg" className="w-full sm:w-auto">
+            <div className="flex justify-center">
+              <CustomButton size="lg" className="h-14 px-12 text-lg">
                 Start Creating
               </CustomButton>
-              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-                <CustomButton
-                  variant="outline"
-                  size="lg"
-                  className="flex w-full items-center justify-center gap-2 sm:w-auto"
-                >
-                  <Chrome className="h-5 w-5" />
-                  Continue with Google
-                </CustomButton>
-                <CustomButton
-                  variant="outline"
-                  size="lg"
-                  className="flex w-full items-center justify-center gap-2 sm:w-auto"
-                >
-                  <Github className="h-5 w-5" />
-                  Continue with GitHub
-                </CustomButton>
-              </div>
             </div>
           </div>
         </div>
@@ -88,69 +93,6 @@ const Index = () => {
             description="All characters are fully licensed and ready for commercial use."
             className="animate-float [animation-delay:400ms]"
           />
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section className="container mx-auto px-4 pb-24">
-        <div className="mx-auto max-w-lg rounded-2xl border border-gray-100 bg-white p-8 shadow-lg">
-          <h2 className="mb-2 text-center text-2xl font-bold text-gray-900">Start Creating Today</h2>
-          <p className="mb-6 text-center text-gray-600">Try Saga free for 14 days</p>
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 text-gray-600">
-              <svg
-                className="h-5 w-5 text-saga-500"
-                fill="none"
-                height="24"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              Unlimited AI character generation
-            </div>
-            <div className="flex items-center gap-3 text-gray-600">
-              <svg
-                className="h-5 w-5 text-saga-500"
-                fill="none"
-                height="24"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              Commercial license included
-            </div>
-            <div className="flex items-center gap-3 text-gray-600">
-              <svg
-                className="h-5 w-5 text-saga-500"
-                fill="none"
-                height="24"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              Priority support
-            </div>
-          </div>
-          <CustomButton className="mt-8 w-full">Start Your Free Trial</CustomButton>
-          <p className="mt-4 text-center text-sm text-gray-500">No credit card required</p>
         </div>
       </section>
     </div>
