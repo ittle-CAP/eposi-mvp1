@@ -5,21 +5,9 @@ import { FeatureCard } from "@/components/feature-card";
 
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  const backgroundImages = [
-    "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-    "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-    "https://images.unsplash.com/photo-1466721591366-2d5fba72006d",
-    "https://images.unsplash.com/photo-1438565434616-3ef039228b15"
-  ];
 
   useEffect(() => {
     setIsVisible(true);
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % backgroundImages.length);
-    }, 5000);
-    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -41,18 +29,6 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="container relative mx-auto px-4 pt-32 text-center">
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          {backgroundImages.map((image, index) => (
-            <img
-              key={image}
-              src={image}
-              alt=""
-              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
-                currentImageIndex === index ? "opacity-30" : "opacity-0"
-              }`}
-            />
-          ))}
-        </div>
         <div className="mx-auto max-w-3xl">
           <div
             className={`transform transition-all duration-1000 ${

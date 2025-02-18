@@ -25,7 +25,7 @@ const FeatureCard = ({ title, description, icon, className }: FeatureCardProps) 
       )}
     >
       <div className="relative z-10">
-        <div className="mb-4 inline-flex rounded-lg bg-saga-50 p-3 text-saga-500 transition-transform duration-300 group-hover:scale-110">
+        <div className="mb-4 inline-flex rounded-lg bg-[#553D8A]/10 p-3 text-[#553D8A] transition-transform duration-300 group-hover:scale-110">
           <Icon className="h-6 w-6" />
         </div>
         <h3 className="mb-2 text-lg font-semibold text-gray-900">{title}</h3>
