@@ -1,10 +1,14 @@
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { CustomButton } from "@/components/ui/custom-button";
 import { FeatureCard } from "@/components/feature-card";
+import { useAuth } from "@/components/AuthProvider";
 
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsVisible(true);
@@ -17,12 +21,23 @@ const Index = () => {
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="text-xl font-semibold text-gray-900">Saga</div>
           <nav className="flex items-center gap-4">
-            <CustomButton variant="ghost" size="sm">
-              Log In
-            </CustomButton>
-            <CustomButton size="sm">
-              Sign Up
-            </CustomButton>
+            {user ? (
+              <>
+                <span className="text-sm text-gray-600">Welcome, {user.email}</span>
+                <CustomButton variant="ghost" size="sm" onClick={() => signOut()}>
+                  Sign Out
+                </CustomButton>
+              </>
+            ) : (
+              <>
+                <CustomButton variant="ghost" size="sm" onClick={() => navigate("/auth")}>
+                  Log In
+                </CustomButton>
+                <CustomButton size="sm" onClick={() => navigate("/auth")}>
+                  Sign Up
+                </CustomButton>
+              </>
+            )}
           </nav>
         </div>
       </header>
@@ -42,8 +57,8 @@ const Index = () => {
               Create Stunning Videos With Professional Characters, All Fully Licensed And Ready For Your AI Projects.
             </p>
             <div className="flex justify-center">
-              <CustomButton size="lg" className="h-14 px-12 text-lg">
-                Start Creating
+              <CustomButton size="lg" className="h-14 px-12 text-lg" onClick={() => !user && navigate("/auth")}>
+                {user ? "Start Creating" : "Sign Up to Start"}
               </CustomButton>
             </div>
           </div>
