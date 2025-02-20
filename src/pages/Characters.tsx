@@ -89,7 +89,7 @@ const Characters = () => {
 
   const filteredCharacters = characters.filter((character) => {
     const matchesSearch = character.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesGenre = !selectedGenre || character.genre === selectedGenre;
+    const matchesGenre = !selectedGenre || selectedGenre === "all" || character.genre === selectedGenre;
     return matchesSearch && matchesGenre;
   });
 
@@ -121,7 +121,7 @@ const Characters = () => {
             <SelectContent>
               <SelectGroup>
                 {genres.map((genre) => (
-                  <SelectItem key={genre} value={genre === "All" ? "" : genre}>
+                  <SelectItem key={genre} value={genre === "All" ? "all" : genre}>
                     {genre}
                   </SelectItem>
                 ))}
