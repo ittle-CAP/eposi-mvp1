@@ -145,21 +145,37 @@ const Auth = () => {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           {isSignUp && (
+            <div>
+              <label htmlFor="fullName" className="text-sm font-medium text-gray-700">
+                Full Name
+              </label>
+              <input
+                id="fullName"
+                type="text"
+                required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-[#553D8A] focus:outline-none focus:ring-1 focus:ring-[#553D8A]"
+              />
+            </div>
+          )}
+
+          <div>
+            <label htmlFor="email" className="text-sm font-medium text-gray-700">
+              Email address
+            </label>
+            <input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-[#553D8A] focus:outline-none focus:ring-1 focus:ring-[#553D8A]"
+            />
+          </div>
+
+          {isSignUp && (
             <>
-              <div>
-                <label htmlFor="fullName" className="text-sm font-medium text-gray-700">
-                  Full Name
-                </label>
-                <input
-                  id="fullName"
-                  type="text"
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-[#553D8A] focus:outline-none focus:ring-1 focus:ring-[#553D8A]"
-                />
-              </div>
-              
               <div>
                 <label htmlFor="region" className="text-sm font-medium text-gray-700">
                   Region
@@ -203,20 +219,6 @@ const Auth = () => {
               </div>
             </>
           )}
-
-          <div>
-            <label htmlFor="email" className="text-sm font-medium text-gray-700">
-              Email address
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-[#553D8A] focus:outline-none focus:ring-1 focus:ring-[#553D8A]"
-            />
-          </div>
 
           <div className="relative">
             <label htmlFor="password" className="text-sm font-medium text-gray-700">
