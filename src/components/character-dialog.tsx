@@ -9,7 +9,7 @@ interface Character {
   imageUrl: string;
   isLocked: boolean;
   description: string;
-  popularity: number;
+  unlocks: number;
 }
 
 interface CharacterDialogProps {
@@ -40,7 +40,7 @@ export const CharacterDialog = ({ character, onClose }: CharacterDialogProps) =>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500">Genre: {character.genre}</span>
               <span className="text-sm text-gray-500">
-                Popularity: {character.popularity}%
+                Unlocks: {character.unlocks.toLocaleString()}
               </span>
             </div>
 

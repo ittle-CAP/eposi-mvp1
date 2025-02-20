@@ -9,7 +9,7 @@ interface Character {
   imageUrl: string;
   isLocked: boolean;
   description: string;
-  popularity: number;
+  unlocks: number;
 }
 
 interface CharacterCardProps {
