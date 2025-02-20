@@ -93,7 +93,7 @@ const Characters = () => {
     return matchesSearch && matchesGenre;
   });
 
-  const genres = ["Fantasy", "Sci-fi", "Anime", "Gaming", "Television", "Film"];
+  const genres = ["All", "Fantasy", "Sci-fi", "Anime", "Gaming", "Television", "Film"];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-8">
@@ -121,7 +121,7 @@ const Characters = () => {
             <SelectContent>
               <SelectGroup>
                 {genres.map((genre) => (
-                  <SelectItem key={genre} value={genre}>
+                  <SelectItem key={genre} value={genre === "All" ? "" : genre}>
                     {genre}
                   </SelectItem>
                 ))}
