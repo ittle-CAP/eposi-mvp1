@@ -1,19 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CustomButton } from "@/components/ui/custom-button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { Check, X } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { PasswordFields } from "@/components/auth/PasswordFields";
+import { SignUpFields } from "@/components/auth/SignUpFields";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -145,19 +136,16 @@ const Auth = () => {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           {isSignUp && (
-            <div>
-              <label htmlFor="fullName" className="text-sm font-medium text-gray-700">
-                Full Name
-              </label>
-              <input
-                id="fullName"
-                type="text"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-[#553D8A] focus:outline-none focus:ring-1 focus:ring-[#553D8A]"
-              />
-            </div>
+            <SignUpFields
+              fullName={fullName}
+              region={region}
+              birthYear={birthYear}
+              setFullName={setFullName}
+              setRegion={setRegion}
+              setBirthYear={setBirthYear}
+              countries={countries}
+              years={years}
+            />
           )}
 
           <div>
@@ -174,106 +162,14 @@ const Auth = () => {
             />
           </div>
 
-          {isSignUp && (
-            <>
-              <div>
-                <label htmlFor="region" className="text-sm font-medium text-gray-700">
-                  Region
-                </label>
-                <Select value={region} onValueChange={setRegion}>
-                  <SelectTrigger className="mt-1 w-full">
-                    <SelectValue placeholder="Select your country" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Countries</SelectLabel>
-                      {countries.map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {country}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label htmlFor="birthYear" className="text-sm font-medium text-gray-700">
-                  Birth Year
-                </label>
-                <Select value={birthYear} onValueChange={setBirthYear}>
-                  <SelectTrigger className="mt-1 w-full">
-                    <SelectValue placeholder="Select your birth year" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Year</SelectLabel>
-                      {years.map((year) => (
-                        <SelectItem key={year} value={year.toString()}>
-                          {year}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-            </>
-          )}
-
-          <div className="relative">
-            <label htmlFor="password" className="text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-[#553D8A] focus:outline-none focus:ring-1 focus:ring-[#553D8A]"
-              />
-              {isSignUp && password && (
-                <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                  {passwordValid ? (
-                    <Check className="h-5 w-5 text-green-500" />
-                  ) : null}
-                </div>
-              )}
-            </div>
-            {isSignUp && !passwordValid && password && (
-              <p className="mt-1 text-sm text-red-500">
-                Password should be at least 6 characters with uppercase, lowercase, and numbers
-              </p>
-            )}
-          </div>
-
-          {isSignUp && (
-            <div className="relative">
-              <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <input
-                  id="confirmPassword"
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-[#553D8A] focus:outline-none focus:ring-1 focus:ring-[#553D8A]"
-                />
-                {confirmPassword && (
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                    {password === confirmPassword ? (
-                      <Check className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <X className="h-5 w-5 text-red-500" />
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+          <PasswordFields
+            password={password}
+            confirmPassword={confirmPassword}
+            passwordValid={passwordValid}
+            setPassword={setPassword}
+            setConfirmPassword={setConfirmPassword}
+            isSignUp={isSignUp}
+          />
 
           <CustomButton type="submit" className="w-full" isLoading={isLoading}>
             {isSignUp ? "Sign Up" : "Sign In"}
