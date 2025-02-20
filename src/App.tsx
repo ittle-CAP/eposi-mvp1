@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Characters from "./pages/Characters";
 import SubscriptionDashboard from "./pages/SubscriptionDashboard";
+import VideoGeneration from "./pages/VideoGeneration";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/characters" element={<Characters />} />
             <Route path="/subscription" element={<SubscriptionDashboard />} />
+            <Route path="/generate" element={<VideoGeneration />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
