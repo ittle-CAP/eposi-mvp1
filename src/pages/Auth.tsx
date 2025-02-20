@@ -19,7 +19,6 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Password validation
   const validatePassword = (pass: string) => {
     const hasUpperCase = /[A-Z]/.test(pass);
     const hasLowerCase = /[a-z]/.test(pass);
@@ -32,7 +31,6 @@ const Auth = () => {
     setPasswordValid(validatePassword(password));
   }, [password]);
 
-  // Generate years for dropdown (1900 to current year)
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => currentYear - i);
 
@@ -99,7 +97,6 @@ const Auth = () => {
     }
   };
 
-  // List of countries with US first
   const countries = [
     "United States",
     "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan",
@@ -136,16 +133,19 @@ const Auth = () => {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           {isSignUp && (
-            <SignUpFields
-              fullName={fullName}
-              region={region}
-              birthYear={birthYear}
-              setFullName={setFullName}
-              setRegion={setRegion}
-              setBirthYear={setBirthYear}
-              countries={countries}
-              years={years}
-            />
+            <div>
+              <label htmlFor="fullName" className="text-sm font-medium text-gray-700">
+                Full Name
+              </label>
+              <input
+                id="fullName"
+                type="text"
+                required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-[#553D8A] focus:outline-none focus:ring-1 focus:ring-[#553D8A]"
+              />
+            </div>
           )}
 
           <div>
@@ -170,6 +170,52 @@ const Auth = () => {
             setConfirmPassword={setConfirmPassword}
             isSignUp={isSignUp}
           />
+
+          {isSignUp && (
+            <>
+              <div>
+                <label htmlFor="birthYear" className="text-sm font-medium text-gray-700">
+                  Birth Year
+                </label>
+                <Select value={birthYear} onValueChange={setBirthYear}>
+                  <SelectTrigger className="mt-1 w-full">
+                    <SelectValue placeholder="Select your birth year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Year</SelectLabel>
+                      {years.map((year) => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label htmlFor="region" className="text-sm font-medium text-gray-700">
+                  Region
+                </label>
+                <Select value={region} onValueChange={setRegion}>
+                  <SelectTrigger className="mt-1 w-full">
+                    <SelectValue placeholder="Select your country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Countries</SelectLabel>
+                      {countries.map((country) => (
+                        <SelectItem key={country} value={country}>
+                          {country}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            </>
+          )}
 
           <CustomButton type="submit" className="w-full" isLoading={isLoading}>
             {isSignUp ? "Sign Up" : "Sign In"}
