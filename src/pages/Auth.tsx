@@ -172,49 +172,16 @@ const Auth = () => {
           />
 
           {isSignUp && (
-            <>
-              <div>
-                <label htmlFor="birthYear" className="text-sm font-medium text-gray-700">
-                  Birth Year
-                </label>
-                <Select value={birthYear} onValueChange={setBirthYear}>
-                  <SelectTrigger className="mt-1 w-full">
-                    <SelectValue placeholder="Select your birth year" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Year</SelectLabel>
-                      {years.map((year) => (
-                        <SelectItem key={year} value={year.toString()}>
-                          {year}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label htmlFor="region" className="text-sm font-medium text-gray-700">
-                  Region
-                </label>
-                <Select value={region} onValueChange={setRegion}>
-                  <SelectTrigger className="mt-1 w-full">
-                    <SelectValue placeholder="Select your country" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Countries</SelectLabel>
-                      {countries.map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {country}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-            </>
+            <SignUpFields
+              fullName={fullName}
+              region={region}
+              birthYear={birthYear}
+              setFullName={setFullName}
+              setRegion={setRegion}
+              setBirthYear={setBirthYear}
+              countries={countries}
+              years={years}
+            />
           )}
 
           <CustomButton type="submit" className="w-full" isLoading={isLoading}>
