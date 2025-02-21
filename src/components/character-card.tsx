@@ -1,6 +1,7 @@
 
 import { Lock } from "lucide-react";
 import { CustomButton } from "@/components/ui/custom-button";
+import { useNavigate } from "react-router-dom";
 
 interface Character {
   id: string;
@@ -18,6 +19,15 @@ interface CharacterCardProps {
 }
 
 export const CharacterCard = ({ character, onClick }: CharacterCardProps) => {
+  const navigate = useNavigate();
+
+  const handleGenerateClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!character.isLocked) {
+      navigate(`/generate?character=${character.id}`);
+    }
+  };
+
   return (
     <div
       onClick={onClick}
@@ -45,10 +55,7 @@ export const CharacterCard = ({ character, onClick }: CharacterCardProps) => {
         <CustomButton
           className="mt-2 w-full"
           variant={character.isLocked ? "outline" : "default"}
-          onClick={(e) => {
-            e.stopPropagation();
-            // Handle unlock/generate logic
-          }}
+          onClick={handleGenerateClick}
         >
           {character.isLocked ? "Unlock" : "Generate Video"}
         </CustomButton>
