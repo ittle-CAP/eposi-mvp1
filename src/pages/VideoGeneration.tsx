@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CustomButton } from "@/components/ui/custom-button";
 import { Download, Share2, Video } from "lucide-react";
@@ -50,6 +50,11 @@ const VideoGeneration = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-8">
+      {/* Logo */}
+      <Link to="/" className="fixed left-4 top-4 text-xl font-semibold text-gray-900">
+        Saga
+      </Link>
+
       <div className="mx-auto max-w-4xl">
         <h1 className="mb-8 text-center text-4xl font-bold text-gray-900">Generate AI Video</h1>
 
