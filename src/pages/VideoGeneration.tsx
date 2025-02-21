@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CustomButton } from "@/components/ui/custom-button";
 import { Download, Share2, Video } from "lucide-react";
@@ -11,6 +12,7 @@ interface Character {
 }
 
 const VideoGeneration = () => {
+  const [searchParams] = useSearchParams();
   const [selectedCharacter, setSelectedCharacter] = useState<string>("");
   const [prompt, setPrompt] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -29,6 +31,13 @@ const VideoGeneration = () => {
       imageUrl: "https://images.unsplash.com/photo-1498936178812-4b2e558d2937",
     },
   ];
+
+  useEffect(() => {
+    const characterId = searchParams.get("character");
+    if (characterId) {
+      setSelectedCharacter(characterId);
+    }
+  }, [searchParams]);
 
   const handleGenerate = async () => {
     setIsGenerating(true);
