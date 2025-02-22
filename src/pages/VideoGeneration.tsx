@@ -5,12 +5,8 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { CustomButton } from "@/components/ui/custom-button";
 import { Download, Share2, Video } from "lucide-react";
 import { Header } from "@/components/navigation/header";
-
-interface Character {
-  id: string;
-  name: string;
-  imageUrl: string;
-}
+import { supabase } from "@/integrations/supabase/client";
+import { Character } from "@/types/character";
 
 const VideoGeneration = () => {
   const [searchParams] = useSearchParams();
@@ -18,20 +14,46 @@ const VideoGeneration = () => {
   const [prompt, setPrompt] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string>("");
+  const [unlockedCharacters, setUnlockedCharacters] = useState<Character[]>([]);
 
-  // Example data (in a real app, this would come from your backend)
-  const unlockedCharacters: Character[] = [
-    {
-      id: "1",
-      name: "Neo",
-      imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
-    },
-    {
-      id: "2",
-      name: "BuzzBot",
-      imageUrl: "https://images.unsplash.com/photo-1498936178812-4b2e558d2937",
-    },
-  ];
+  useEffect(() => {
+    const fetchUnlockedCharacters = async () => {
+      const { data: unlockedData, error: unlockedError } = await supabase
+        .from('unlocked_characters')
+        .select('*');
+
+      if (unlockedError) {
+        console.error('Error fetching unlocked characters:', unlockedError);
+        return;
+      }
+
+      // For now, we'll use these as example characters that match the unlocked IDs
+      const characterData: Character[] = [
+        {
+          id: "1",
+          name: "Luna",
+          genre: "Fantasy",
+          imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
+          isLocked: false,
+          description: "A mystical character with the power to control dreams and nightmares.",
+          unlocks: 1523,
+        },
+        {
+          id: "2",
+          name: "Neo",
+          genre: "Sci-fi",
+          imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+          isLocked: false,
+          description: "A digital warrior fighting against the machine world.",
+          unlocks: 2891,
+        },
+      ].filter(char => unlockedData.some(unlocked => unlocked.character_id === char.id));
+
+      setUnlockedCharacters(characterData);
+    };
+
+    fetchUnlockedCharacters();
+  }, []);
 
   useEffect(() => {
     const characterId = searchParams.get("character");
