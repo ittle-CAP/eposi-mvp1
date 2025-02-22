@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CustomButton } from "@/components/ui/custom-button";
@@ -75,17 +74,14 @@ const Auth = () => {
           },
         });
         if (error) throw error;
-        toast({
-          title: "Success!",
-          description: "Please check your email to confirm your account.",
-        });
+        navigate("/characters");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
-        navigate("/");
+        navigate("/characters");
       }
     } catch (error: any) {
       toast({
