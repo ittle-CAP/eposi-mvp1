@@ -40,20 +40,23 @@ const VideoGeneration = () => {
           return;
         }
 
-        console.log('Unlocked characters from DB:', unlockedData);
+        console.log('Raw unlocked characters data:', unlockedData);
 
         // Transform the unlocked data into Character objects
-        const characters: Character[] = unlockedData.map(char => ({
-          id: char.character_id,
-          name: char.character_name,
-          genre: "AI Character", // Default genre
-          imageUrl: char.image_url || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e', // Use stored image_url or fallback
-          isLocked: false,
-          description: `An AI character named ${char.character_name}`,
-          unlocks: 0
-        }));
+        const characters: Character[] = unlockedData.map(char => {
+          console.log('Processing character:', char);
+          return {
+            id: char.character_id,
+            name: char.character_name,
+            genre: "AI Character",
+            imageUrl: char.image_url || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e',
+            isLocked: false,
+            description: `An AI character named ${char.character_name}`,
+            unlocks: 0
+          };
+        });
 
-        console.log('Transformed characters:', characters);
+        console.log('Transformed characters with images:', characters);
         setUnlockedCharacters(characters);
       } catch (error) {
         console.error('Error in fetchUnlockedCharacters:', error);
