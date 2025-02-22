@@ -5,6 +5,7 @@ import { CreditCard, User, Settings, Plus, ShoppingCart } from "lucide-react";
 import { CustomButton } from "@/components/ui/custom-button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Header } from "@/components/navigation/header";
 
 interface UnlockedCharacter {
   id: string;
@@ -87,13 +88,9 @@ const SubscriptionDashboard = () => {
   }, [toast]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-8">
-      {/* Logo */}
-      <Link to="/" className="fixed left-4 top-4 text-xl font-semibold text-gray-900">
-        Saga
-      </Link>
-
-      <div className="mx-auto max-w-4xl">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <Header />
+      <div className="container mx-auto max-w-4xl px-4 pt-24">
         <h1 className="mb-8 text-center text-4xl font-bold text-gray-900">Subscription Dashboard</h1>
 
         {/* Currencies Section */}
@@ -141,7 +138,7 @@ const SubscriptionDashboard = () => {
             {unlockedCharacters.map((character) => (
               <div key={character.id} className="flex items-center gap-4 rounded-lg border p-4">
                 <img
-                  src={`/placeholder.svg`} // We'll need to add character images later
+                  src={`/placeholder.svg`}
                   alt={character.character_name}
                   className="h-16 w-16 rounded-lg object-cover bg-gray-100"
                 />

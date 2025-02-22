@@ -79,7 +79,7 @@ export const UserNav = () => {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/video-generation" className="flex w-full cursor-pointer items-center">
+                <Link to="/generate" className="flex w-full cursor-pointer items-center">
                   <Video className="mr-2 h-4 w-4" />
                   <span>Create</span>
                 </Link>
