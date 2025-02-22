@@ -91,9 +91,9 @@ const SubscriptionDashboard = () => {
             <p className="text-gray-600">Current Plan: <span className="font-medium">Basic</span></p>
             <p className="text-sm text-gray-500">Renews on February 1st, 2024</p>
           </div>
-          <CustomButton className="w-full gap-2">
-            <Plus className="h-4 w-4" />
-            Upgrade for More Credits
+          <CustomButton className="relative w-full">
+            <Plus className="absolute left-4 h-4 w-4" />
+            <span className="mx-auto">Upgrade for More Credits</span>
           </CustomButton>
         </div>
 
@@ -106,9 +106,9 @@ const SubscriptionDashboard = () => {
               </div>
               <h2 className="text-xl font-semibold text-gray-900">Purchase Credits</h2>
             </div>
-            <CustomButton variant="outline" className="gap-2">
-              <Plus className="h-4 w-4" />
-              Buy Credits
+            <CustomButton variant="outline" className="relative">
+              <Plus className="absolute left-2 h-4 w-4" />
+              <span className="ml-6">Buy Credits</span>
             </CustomButton>
           </div>
           <p className="text-gray-600">Need more credits? Purchase additional credits to unlock more characters.</p>

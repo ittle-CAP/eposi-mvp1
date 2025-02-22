@@ -106,10 +106,10 @@ const VideoGeneration = () => {
             onClick={handleGenerate}
             isLoading={isGenerating}
             disabled={!selectedCharacter || !prompt || isGenerating}
-            className="mb-6 w-full gap-2"
+            className="relative mb-6 w-full"
           >
-            <Video className="h-4 w-4" />
-            Generate Video
+            <Video className="absolute left-4 h-4 w-4" />
+            <span className="mx-auto">Generate Video</span>
           </CustomButton>
 
           {/* Video Preview */}
@@ -123,13 +123,13 @@ const VideoGeneration = () => {
                 />
               </div>
               <div className="flex gap-2">
-                <CustomButton variant="outline" className="flex-1 gap-2">
-                  <Download className="h-4 w-4" />
-                  Download
+                <CustomButton variant="outline" className="relative flex-1">
+                  <Download className="absolute left-4 h-4 w-4" />
+                  <span className="mx-auto">Download</span>
                 </CustomButton>
-                <CustomButton variant="outline" className="flex-1 gap-2">
-                  <Share2 className="h-4 w-4" />
-                  Share
+                <CustomButton variant="outline" className="relative flex-1">
+                  <Share2 className="absolute left-4 h-4 w-4" />
+                  <span className="mx-auto">Share</span>
                 </CustomButton>
               </div>
             </div>
