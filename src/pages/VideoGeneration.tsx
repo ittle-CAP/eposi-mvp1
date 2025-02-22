@@ -47,7 +47,7 @@ const VideoGeneration = () => {
           id: char.character_id,
           name: char.character_name,
           genre: "AI Character", // Default genre
-          imageUrl: `https://images.unsplash.com/photo-1485827404703-89b55fcc595e`, // Default image
+          imageUrl: char.image_url || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e', // Use stored image_url or fallback
           isLocked: false,
           description: `An AI character named ${char.character_name}`,
           unlocks: 0

@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 export const useSubscription = () => {
   const { toast } = useToast();
 
-  const unlockCharacter = async (characterId: string, characterName: string) => {
+  const unlockCharacter = async (characterId: string, characterName: string, imageUrl?: string) => {
     try {
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
@@ -41,13 +41,14 @@ export const useSubscription = () => {
       if (updateError) throw updateError;
 
       console.log('Adding to unlocked characters...');
-      // Add character to unlocked_characters
+      // Add character to unlocked_characters with image_url
       const { error: unlockError } = await supabase
         .from('unlocked_characters')
         .insert({
           character_id: characterId,
           character_name: characterName,
-          user_id: userData.user.id
+          user_id: userData.user.id,
+          image_url: imageUrl
         });
 
       if (unlockError) {

@@ -89,6 +89,7 @@ export type Database = {
           character_name: string
           created_at: string | null
           id: string
+          image_url: string | null
           last_used_at: string | null
           user_id: string
         }
@@ -97,6 +98,7 @@ export type Database = {
           character_name: string
           created_at?: string | null
           id?: string
+          image_url?: string | null
           last_used_at?: string | null
           user_id: string
         }
@@ -105,6 +107,7 @@ export type Database = {
           character_name?: string
           created_at?: string | null
           id?: string
+          image_url?: string | null
           last_used_at?: string | null
           user_id?: string
         }
