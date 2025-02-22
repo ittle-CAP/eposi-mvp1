@@ -23,6 +23,11 @@ export const UnlockConfirmationDialog = ({
   onConfirm,
   characterName,
 }: UnlockConfirmationDialogProps) => {
+  const handleConfirm = () => {
+    onConfirm();
+    onClose();
+  };
+
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent>
@@ -37,7 +42,7 @@ export const UnlockConfirmationDialog = ({
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
-            onClick={onConfirm}
+            onClick={handleConfirm}
             className="bg-[#553D8A] text-white hover:bg-[#553D8A]/90"
           >
             Unlock Character

@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { CustomButton } from "@/components/ui/custom-button";
 import { UnlockConfirmationDialog } from "@/components/characters/unlock-confirmation-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useNavigate } from "react-router-dom";
 
 interface Character {
   id: string;
@@ -23,6 +24,7 @@ interface CharacterDialogProps {
 
 export const CharacterDialog = ({ character, onClose, onUnlock }: CharacterDialogProps) => {
   const [showUnlockConfirmation, setShowUnlockConfirmation] = useState(false);
+  const navigate = useNavigate();
 
   if (!character) return null;
 
@@ -35,6 +37,11 @@ export const CharacterDialog = ({ character, onClose, onUnlock }: CharacterDialo
       onUnlock(character);
     }
     setShowUnlockConfirmation(false);
+  };
+
+  const handleGenerateClick = () => {
+    onClose();
+    navigate(`/generate?character=${character.id}`);
   };
 
   return (
@@ -50,7 +57,7 @@ export const CharacterDialog = ({ character, onClose, onUnlock }: CharacterDialo
               <img
                 src={character.imageUrl}
                 alt={character.name}
-                className="w-full rounded-lg object-cover"
+                className={`w-full rounded-lg object-cover ${character.isLocked ? 'opacity-50' : ''}`}
               />
 
               <div className="space-y-4">
@@ -63,13 +70,21 @@ export const CharacterDialog = ({ character, onClose, onUnlock }: CharacterDialo
                   </span>
                 </div>
 
-                {character.isLocked && (
+                {character.isLocked ? (
                   <CustomButton
                     className="w-full"
                     variant="outline"
                     onClick={handleUnlock}
                   >
                     Unlock Character
+                  </CustomButton>
+                ) : (
+                  <CustomButton
+                    className="w-full"
+                    variant="default"
+                    onClick={handleGenerateClick}
+                  >
+                    Generate Video
                   </CustomButton>
                 )}
 
@@ -81,15 +96,6 @@ export const CharacterDialog = ({ character, onClose, onUnlock }: CharacterDialo
                     <div className="aspect-video rounded bg-gray-100"></div>
                   </div>
                 </div>
-
-                {!character.isLocked && (
-                  <CustomButton
-                    className="w-full"
-                    variant="default"
-                  >
-                    Generate Video
-                  </CustomButton>
-                )}
               </div>
             </div>
           </ScrollArea>
