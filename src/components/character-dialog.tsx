@@ -15,10 +15,17 @@ interface Character {
 interface CharacterDialogProps {
   character: Character | null;
   onClose: () => void;
+  onUnlock?: (character: Character) => void;
 }
 
-export const CharacterDialog = ({ character, onClose }: CharacterDialogProps) => {
+export const CharacterDialog = ({ character, onClose, onUnlock }: CharacterDialogProps) => {
   if (!character) return null;
+
+  const handleUnlock = () => {
+    if (onUnlock && character.isLocked) {
+      onUnlock(character);
+    }
+  };
 
   return (
     <Dialog open={!!character} onOpenChange={onClose}>
@@ -56,8 +63,9 @@ export const CharacterDialog = ({ character, onClose }: CharacterDialogProps) =>
             <CustomButton
               className="w-full"
               variant={character.isLocked ? "outline" : "default"}
+              onClick={handleUnlock}
             >
-              {character.isLocked ? "Unlock with Credits" : "Generate Video"}
+              {character.isLocked ? "Unlock Character" : "Generate Video"}
             </CustomButton>
           </div>
         </div>

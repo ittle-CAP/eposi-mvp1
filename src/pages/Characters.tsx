@@ -1,10 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CharacterCard } from "@/components/character-card";
 import { CharacterDialog } from "@/components/character-dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/use-subscription";
 
 interface Character {
   id: string;
@@ -20,6 +22,25 @@ const Characters = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("");
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
+  const [unlockedCharacterIds, setUnlockedCharacterIds] = useState<string[]>([]);
+  const { unlockCharacter } = useSubscription();
+
+  useEffect(() => {
+    const fetchUnlockedCharacters = async () => {
+      const { data, error } = await supabase
+        .from('unlocked_characters')
+        .select('character_id');
+      
+      if (error) {
+        console.error('Error fetching unlocked characters:', error);
+        return;
+      }
+
+      setUnlockedCharacterIds(data.map(char => char.character_id));
+    };
+
+    fetchUnlockedCharacters();
+  }, []);
 
   // Example characters data (in a real app, this would come from your backend)
   const characters: Character[] = [
@@ -28,7 +49,7 @@ const Characters = () => {
       name: "Luna",
       genre: "Fantasy",
       imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
-      isLocked: true,
+      isLocked: !unlockedCharacterIds.includes("1"),
       description: "A mystical character with the power to control dreams and nightmares.",
       unlocks: 1523,
     },
@@ -96,6 +117,15 @@ const Characters = () => {
 
   const genres = ["All", "Fantasy", "Sci-fi", "Anime", "Gaming", "Television", "Film"];
 
+  const handleUnlockCharacter = async (character: Character) => {
+    if (!character.isLocked) return;
+    
+    const success = await unlockCharacter(character.id, character.name);
+    if (success) {
+      setUnlockedCharacterIds([...unlockedCharacterIds, character.id]);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-8">
       {/* Logo */}
@@ -142,7 +172,10 @@ const Characters = () => {
         {filteredCharacters.map((character) => (
           <CharacterCard
             key={character.id}
-            character={character}
+            character={{
+              ...character,
+              isLocked: !unlockedCharacterIds.includes(character.id)
+            }}
             onClick={() => setSelectedCharacter(character)}
           />
         ))}
@@ -150,8 +183,12 @@ const Characters = () => {
 
       {/* Character Detail Dialog */}
       <CharacterDialog
-        character={selectedCharacter}
+        character={selectedCharacter ? {
+          ...selectedCharacter,
+          isLocked: !unlockedCharacterIds.includes(selectedCharacter.id)
+        } : null}
         onClose={() => setSelectedCharacter(null)}
+        onUnlock={handleUnlockCharacter}
       />
     </div>
   );
