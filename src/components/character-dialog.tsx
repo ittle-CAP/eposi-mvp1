@@ -63,6 +63,16 @@ export const CharacterDialog = ({ character, onClose, onUnlock }: CharacterDialo
                   </span>
                 </div>
 
+                {character.isLocked && (
+                  <CustomButton
+                    className="w-full"
+                    variant="outline"
+                    onClick={handleUnlock}
+                  >
+                    Unlock Character
+                  </CustomButton>
+                )}
+
                 <div className="space-y-2">
                   <h4 className="font-medium text-gray-900">Community Creations</h4>
                   <div className="grid grid-cols-2 gap-4">
@@ -72,13 +82,14 @@ export const CharacterDialog = ({ character, onClose, onUnlock }: CharacterDialo
                   </div>
                 </div>
 
-                <CustomButton
-                  className="w-full"
-                  variant={character.isLocked ? "outline" : "default"}
-                  onClick={character.isLocked ? handleUnlock : undefined}
-                >
-                  {character.isLocked ? "Unlock Character" : "Generate Video"}
-                </CustomButton>
+                {!character.isLocked && (
+                  <CustomButton
+                    className="w-full"
+                    variant="default"
+                  >
+                    Generate Video
+                  </CustomButton>
+                )}
               </div>
             </div>
           </ScrollArea>
