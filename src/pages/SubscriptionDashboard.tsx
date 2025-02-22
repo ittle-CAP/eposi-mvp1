@@ -8,9 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 
 interface UnlockedCharacter {
   id: string;
-  name: string;
-  imageUrl: string;
-  lastUsed: string;
+  character_id: string;
+  character_name: string;
+  last_used_at: string;
 }
 
 interface Subscription {
@@ -21,20 +21,7 @@ interface Subscription {
 
 const SubscriptionDashboard = () => {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [unlockedCharacters] = useState<UnlockedCharacter[]>([
-    {
-      id: "1",
-      name: "Neo",
-      imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
-      lastUsed: "2024-01-15",
-    },
-    {
-      id: "2",
-      name: "BuzzBot",
-      imageUrl: "https://images.unsplash.com/photo-1498936178812-4b2e558d2937",
-      lastUsed: "2024-01-10",
-    },
-  ]);
+  const [unlockedCharacters, setUnlockedCharacters] = useState<UnlockedCharacter[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -66,7 +53,36 @@ const SubscriptionDashboard = () => {
       }
     };
 
+    const fetchUnlockedCharacters = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('unlocked_characters')
+          .select('*')
+          .order('last_used_at', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching unlocked characters:', error);
+          toast({
+            title: "Error",
+            description: "Failed to load unlocked characters",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        setUnlockedCharacters(data || []);
+      } catch (err) {
+        console.error('Error:', err);
+        toast({
+          title: "Error",
+          description: "Something went wrong",
+          variant: "destructive",
+        });
+      }
+    };
+
     fetchSubscription();
+    fetchUnlockedCharacters();
   }, [toast]);
 
   return (
@@ -106,18 +122,23 @@ const SubscriptionDashboard = () => {
             {unlockedCharacters.map((character) => (
               <div key={character.id} className="flex items-center gap-4 rounded-lg border p-4">
                 <img
-                  src={character.imageUrl}
-                  alt={character.name}
-                  className="h-16 w-16 rounded-lg object-cover"
+                  src={`/placeholder.svg`} // We'll need to add character images later
+                  alt={character.character_name}
+                  className="h-16 w-16 rounded-lg object-cover bg-gray-100"
                 />
                 <div>
-                  <h3 className="font-medium text-gray-900">{character.name}</h3>
+                  <h3 className="font-medium text-gray-900">{character.character_name}</h3>
                   <p className="text-sm text-gray-500">
-                    Last used: {new Date(character.lastUsed).toLocaleDateString()}
+                    Last used: {character.last_used_at ? new Date(character.last_used_at).toLocaleDateString() : 'Never'}
                   </p>
                 </div>
               </div>
             ))}
+            {unlockedCharacters.length === 0 && (
+              <div className="col-span-2 text-center py-8 text-gray-500">
+                No characters unlocked yet. Use your credits to unlock characters!
+              </div>
+            )}
           </div>
         </div>
 

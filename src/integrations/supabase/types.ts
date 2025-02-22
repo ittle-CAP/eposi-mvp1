@@ -80,6 +80,41 @@ export type Database = {
           },
         ]
       }
+      unlocked_characters: {
+        Row: {
+          character_id: string
+          character_name: string
+          created_at: string | null
+          id: string
+          last_used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          character_id: string
+          character_name: string
+          created_at?: string | null
+          id?: string
+          last_used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          character_id?: string
+          character_name?: string
+          created_at?: string | null
+          id?: string
+          last_used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unlocked_characters_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
