@@ -47,6 +47,7 @@ export type Database = {
           plan_ends_at: string | null
           plan_started_at: string | null
           plan_type: string
+          unlocks_available: number
           updated_at: string | null
           user_id: string
         }
@@ -57,6 +58,7 @@ export type Database = {
           plan_ends_at?: string | null
           plan_started_at?: string | null
           plan_type?: string
+          unlocks_available?: number
           updated_at?: string | null
           user_id: string
         }
@@ -67,6 +69,7 @@ export type Database = {
           plan_ends_at?: string | null
           plan_started_at?: string | null
           plan_type?: string
+          unlocks_available?: number
           updated_at?: string | null
           user_id?: string
         }

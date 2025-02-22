@@ -16,6 +16,7 @@ interface UnlockedCharacter {
 interface Subscription {
   plan_type: string;
   credits_available: number;
+  unlocks_available: number;
   plan_ends_at: string;
 }
 
@@ -95,17 +96,35 @@ const SubscriptionDashboard = () => {
       <div className="mx-auto max-w-4xl">
         <h1 className="mb-8 text-center text-4xl font-bold text-gray-900">Subscription Dashboard</h1>
 
-        {/* Credits Section */}
-        <div className="mb-8 rounded-lg bg-white p-6 shadow-lg">
-          <div className="flex items-center gap-4">
-            <div className="rounded-full bg-[#553D8A]/10 p-3">
-              <CreditCard className="h-6 w-6 text-[#553D8A]" />
+        {/* Currencies Section */}
+        <div className="mb-8 grid gap-4 sm:grid-cols-2">
+          {/* Credits Card */}
+          <div className="rounded-lg bg-white p-6 shadow-lg">
+            <div className="flex items-center gap-4">
+              <div className="rounded-full bg-[#553D8A]/10 p-3">
+                <CreditCard className="h-6 w-6 text-[#553D8A]" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Credits</h2>
+                <p className="text-3xl font-bold text-[#553D8A]">
+                  {subscription?.credits_available ?? 0}
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Available Credits</h2>
-              <p className="text-3xl font-bold text-[#553D8A]">
-                {subscription?.credits_available ?? 0} credits
-              </p>
+          </div>
+
+          {/* Unlocks Card */}
+          <div className="rounded-lg bg-white p-6 shadow-lg">
+            <div className="flex items-center gap-4">
+              <div className="rounded-full bg-[#553D8A]/10 p-3">
+                <User className="h-6 w-6 text-[#553D8A]" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Unlocks</h2>
+                <p className="text-3xl font-bold text-[#553D8A]">
+                  {subscription?.unlocks_available ?? 0}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -136,7 +155,7 @@ const SubscriptionDashboard = () => {
             ))}
             {unlockedCharacters.length === 0 && (
               <div className="col-span-2 text-center py-8 text-gray-500">
-                No characters unlocked yet. Use your credits to unlock characters!
+                No characters unlocked yet. Use your unlocks to get new characters!
               </div>
             )}
           </div>
@@ -160,25 +179,31 @@ const SubscriptionDashboard = () => {
           </div>
           <CustomButton className="w-full flex items-center justify-center gap-2">
             <Plus className="h-4 w-4" />
-            Upgrade for More Credits
+            Upgrade Plan
           </CustomButton>
         </div>
 
-        {/* Purchase Credits Section */}
+        {/* Purchase Section */}
         <div className="rounded-lg bg-white p-6 shadow-lg">
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="rounded-full bg-[#553D8A]/10 p-3">
                 <ShoppingCart className="h-6 w-6 text-[#553D8A]" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900">Purchase Credits</h2>
+              <h2 className="text-xl font-semibold text-gray-900">Purchase More</h2>
             </div>
-            <CustomButton variant="outline" className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Buy Credits
-            </CustomButton>
+            <div className="flex gap-2">
+              <CustomButton variant="outline" className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Buy Credits
+              </CustomButton>
+              <CustomButton variant="outline" className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Buy Unlocks
+              </CustomButton>
+            </div>
           </div>
-          <p className="text-gray-600">Need more credits? Purchase additional credits to unlock more characters.</p>
+          <p className="text-gray-600">Need more credits or unlocks? Purchase additional currency to enhance your experience.</p>
         </div>
       </div>
     </div>
