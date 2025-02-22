@@ -8,6 +8,9 @@ export const useSubscription = () => {
 
   const unlockCharacter = async (characterId: string, characterName: string) => {
     try {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+
       // First, check if user has available unlocks
       const { data: subscription, error: subscriptionError } = await supabase
         .from('subscriptions')
@@ -39,6 +42,7 @@ export const useSubscription = () => {
         .insert({
           character_id: characterId,
           character_name: characterName,
+          user_id: userData.user.id
         });
 
       if (unlockError) throw unlockError;

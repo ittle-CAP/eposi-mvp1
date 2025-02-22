@@ -1,22 +1,11 @@
-
 import { useState, useEffect } from "react";
-import { Search, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CharacterCard } from "@/components/character-card";
 import { CharacterDialog } from "@/components/character-dialog";
+import { SearchFilter } from "@/components/characters/search-filter";
+import { CharacterGrid } from "@/components/characters/character-grid";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/use-subscription";
-
-interface Character {
-  id: string;
-  name: string;
-  genre: string;
-  imageUrl: string;
-  isLocked: boolean;
-  description: string;
-  unlocks: number;
-}
+import { Character } from "@/types/character";
 
 const Characters = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -128,60 +117,26 @@ const Characters = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-8">
-      {/* Logo */}
       <Link to="/" className="fixed left-4 top-4 text-xl font-semibold text-gray-900">
         Saga
       </Link>
 
       <h1 className="mb-8 text-center text-4xl font-bold text-gray-900">Characters</h1>
 
-      {/* Search and Filter Section */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search characters..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 bg-white px-10 py-2 focus:border-[#553D8A] focus:outline-none focus:ring-1 focus:ring-[#553D8A]"
-          />
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Filter className="h-5 w-5 text-gray-400" />
-          <Select value={selectedGenre} onValueChange={setSelectedGenre}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select genre" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                {genres.map((genre) => (
-                  <SelectItem key={genre} value={genre === "All" ? "all" : genre}>
-                    {genre}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      <SearchFilter
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        selectedGenre={selectedGenre}
+        setSelectedGenre={setSelectedGenre}
+        genres={genres}
+      />
 
-      {/* Characters Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {filteredCharacters.map((character) => (
-          <CharacterCard
-            key={character.id}
-            character={{
-              ...character,
-              isLocked: !unlockedCharacterIds.includes(character.id)
-            }}
-            onClick={() => setSelectedCharacter(character)}
-          />
-        ))}
-      </div>
+      <CharacterGrid
+        characters={filteredCharacters}
+        unlockedCharacterIds={unlockedCharacterIds}
+        onSelectCharacter={setSelectedCharacter}
+      />
 
-      {/* Character Detail Dialog */}
       <CharacterDialog
         character={selectedCharacter ? {
           ...selectedCharacter,
