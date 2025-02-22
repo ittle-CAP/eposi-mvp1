@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { CharacterDialog } from "@/components/character-dialog";
 import { SearchFilter } from "@/components/characters/search-filter";
 import { CharacterGrid } from "@/components/characters/character-grid";
+import { Header } from "@/components/navigation/header";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/use-subscription";
 import { Character } from "@/types/character";
@@ -31,7 +31,6 @@ const Characters = () => {
     fetchUnlockedCharacters();
   }, []);
 
-  // Example characters data (in a real app, this would come from your backend)
   const characters: Character[] = [
     {
       id: "1",
@@ -117,11 +116,9 @@ const Characters = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-8">
-      <Link to="/" className="fixed left-4 top-4 text-xl font-semibold text-gray-900">
-        Saga
-      </Link>
+      <Header />
 
-      <h1 className="mb-8 text-center text-4xl font-bold text-gray-900">Characters</h1>
+      <h1 className="mb-8 pt-20 text-center text-4xl font-bold text-gray-900">Characters</h1>
 
       <SearchFilter
         searchQuery={searchQuery}
