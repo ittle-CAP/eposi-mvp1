@@ -40,31 +40,21 @@ const VideoGeneration = () => {
           return;
         }
 
-        console.log('Unlocked characters:', unlockedData);
+        console.log('Unlocked characters from DB:', unlockedData);
 
-        // For now, we'll use these as example characters that match the unlocked IDs
-        const characterData: Character[] = [
-          {
-            id: "1",
-            name: "Luna",
-            genre: "Fantasy",
-            imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
-            isLocked: false,
-            description: "A mystical character with the power to control dreams and nightmares.",
-            unlocks: 1523,
-          },
-          {
-            id: "2",
-            name: "Neo",
-            genre: "Sci-fi",
-            imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
-            isLocked: false,
-            description: "A digital warrior fighting against the machine world.",
-            unlocks: 2891,
-          },
-        ].filter(char => unlockedData.some(unlocked => unlocked.character_id === char.id));
+        // Transform the unlocked data into Character objects
+        const characters: Character[] = unlockedData.map(char => ({
+          id: char.character_id,
+          name: char.character_name,
+          genre: "AI Character", // Default genre
+          imageUrl: `https://images.unsplash.com/photo-1485827404703-89b55fcc595e`, // Default image
+          isLocked: false,
+          description: `An AI character named ${char.character_name}`,
+          unlocks: 0
+        }));
 
-        setUnlockedCharacters(characterData);
+        console.log('Transformed characters:', characters);
+        setUnlockedCharacters(characters);
       } catch (error) {
         console.error('Error in fetchUnlockedCharacters:', error);
         toast({
