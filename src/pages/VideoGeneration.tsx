@@ -7,6 +7,7 @@ import { Download, Share2, Video } from "lucide-react";
 import { Header } from "@/components/navigation/header";
 import { supabase } from "@/integrations/supabase/client";
 import { Character } from "@/types/character";
+import { useToast } from "@/hooks/use-toast";
 
 const VideoGeneration = () => {
   const [searchParams] = useSearchParams();
@@ -15,45 +16,67 @@ const VideoGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string>("");
   const [unlockedCharacters, setUnlockedCharacters] = useState<Character[]>([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchUnlockedCharacters = async () => {
-      const { data: unlockedData, error: unlockedError } = await supabase
-        .from('unlocked_characters')
-        .select('*');
+      try {
+        const { data: user } = await supabase.auth.getUser();
+        if (!user.user) return;
 
-      if (unlockedError) {
-        console.error('Error fetching unlocked characters:', unlockedError);
-        return;
+        console.log('Fetching unlocked characters...');
+        const { data: unlockedData, error: unlockedError } = await supabase
+          .from('unlocked_characters')
+          .select('*')
+          .eq('user_id', user.user.id);
+
+        if (unlockedError) {
+          console.error('Error fetching unlocked characters:', unlockedError);
+          toast({
+            title: "Error",
+            description: "Failed to fetch unlocked characters",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        console.log('Unlocked characters:', unlockedData);
+
+        // For now, we'll use these as example characters that match the unlocked IDs
+        const characterData: Character[] = [
+          {
+            id: "1",
+            name: "Luna",
+            genre: "Fantasy",
+            imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
+            isLocked: false,
+            description: "A mystical character with the power to control dreams and nightmares.",
+            unlocks: 1523,
+          },
+          {
+            id: "2",
+            name: "Neo",
+            genre: "Sci-fi",
+            imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+            isLocked: false,
+            description: "A digital warrior fighting against the machine world.",
+            unlocks: 2891,
+          },
+        ].filter(char => unlockedData.some(unlocked => unlocked.character_id === char.id));
+
+        setUnlockedCharacters(characterData);
+      } catch (error) {
+        console.error('Error in fetchUnlockedCharacters:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch unlocked characters",
+          variant: "destructive",
+        });
       }
-
-      // For now, we'll use these as example characters that match the unlocked IDs
-      const characterData: Character[] = [
-        {
-          id: "1",
-          name: "Luna",
-          genre: "Fantasy",
-          imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
-          isLocked: false,
-          description: "A mystical character with the power to control dreams and nightmares.",
-          unlocks: 1523,
-        },
-        {
-          id: "2",
-          name: "Neo",
-          genre: "Sci-fi",
-          imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
-          isLocked: false,
-          description: "A digital warrior fighting against the machine world.",
-          unlocks: 2891,
-        },
-      ].filter(char => unlockedData.some(unlocked => unlocked.character_id === char.id));
-
-      setUnlockedCharacters(characterData);
     };
 
     fetchUnlockedCharacters();
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     const characterId = searchParams.get("character");
