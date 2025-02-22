@@ -1,11 +1,12 @@
 
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { CreditCard, User, Settings, Plus, ShoppingCart } from "lucide-react";
-import { CustomButton } from "@/components/ui/custom-button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Header } from "@/components/navigation/header";
+import { CurrenciesSection } from "@/components/subscription/currencies-section";
+import { UnlockedCharactersSection } from "@/components/subscription/unlocked-characters-section";
+import { SubscriptionDetailsSection } from "@/components/subscription/subscription-details-section";
+import { PurchaseSection } from "@/components/subscription/purchase-section";
 
 interface UnlockedCharacter {
   id: string;
@@ -92,116 +93,22 @@ const SubscriptionDashboard = () => {
       <Header />
       <div className="container mx-auto max-w-4xl px-4 pt-24">
         <h1 className="mb-8 text-center text-4xl font-bold text-gray-900">Subscription Dashboard</h1>
-
-        {/* Currencies Section */}
-        <div className="mb-8 grid gap-4 sm:grid-cols-2">
-          {/* Credits Card */}
-          <div className="rounded-lg bg-white p-6 shadow-lg">
-            <div className="flex items-center gap-4">
-              <div className="rounded-full bg-[#553D8A]/10 p-3">
-                <CreditCard className="h-6 w-6 text-[#553D8A]" />
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900">Credits</h2>
-                <p className="text-3xl font-bold text-[#553D8A]">
-                  {subscription?.credits_available ?? 0}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Unlocks Card */}
-          <div className="rounded-lg bg-white p-6 shadow-lg">
-            <div className="flex items-center gap-4">
-              <div className="rounded-full bg-[#553D8A]/10 p-3">
-                <User className="h-6 w-6 text-[#553D8A]" />
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900">Unlocks</h2>
-                <p className="text-3xl font-bold text-[#553D8A]">
-                  {subscription?.unlocks_available ?? 0}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Unlocked Characters Section */}
-        <div className="mb-8 rounded-lg bg-white p-6 shadow-lg">
-          <div className="mb-4 flex items-center gap-4">
-            <div className="rounded-full bg-[#553D8A]/10 p-3">
-              <User className="h-6 w-6 text-[#553D8A]" />
-            </div>
-            <h2 className="text-xl font-semibold text-gray-900">Unlocked Characters</h2>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {unlockedCharacters.map((character) => (
-              <div key={character.id} className="flex items-center gap-4 rounded-lg border p-4">
-                <img
-                  src={`/placeholder.svg`}
-                  alt={character.character_name}
-                  className="h-16 w-16 rounded-lg object-cover bg-gray-100"
-                />
-                <div>
-                  <h3 className="font-medium text-gray-900">{character.character_name}</h3>
-                  <p className="text-sm text-gray-500">
-                    Last used: {character.last_used_at ? new Date(character.last_used_at).toLocaleDateString() : 'Never'}
-                  </p>
-                </div>
-              </div>
-            ))}
-            {unlockedCharacters.length === 0 && (
-              <div className="col-span-2 text-center py-8 text-gray-500">
-                No characters unlocked yet. Use your unlocks to get new characters!
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Subscription Details Section */}
-        <div className="mb-8 rounded-lg bg-white p-6 shadow-lg">
-          <div className="mb-4 flex items-center gap-4">
-            <div className="rounded-full bg-[#553D8A]/10 p-3">
-              <Settings className="h-6 w-6 text-[#553D8A]" />
-            </div>
-            <h2 className="text-xl font-semibold text-gray-900">Subscription Details</h2>
-          </div>
-          <div className="mb-6">
-            <p className="text-gray-600">
-              Current Plan: <span className="font-medium capitalize">{subscription?.plan_type ?? 'Loading...'}</span>
-            </p>
-            <p className="text-sm text-gray-500">
-              Renews on {subscription?.plan_ends_at ? new Date(subscription.plan_ends_at).toLocaleDateString() : 'Loading...'}
-            </p>
-          </div>
-          <CustomButton className="w-full flex items-center justify-center gap-2">
-            <Plus className="h-4 w-4" />
-            Upgrade Plan
-          </CustomButton>
-        </div>
-
-        {/* Purchase Section */}
-        <div className="rounded-lg bg-white p-6 shadow-lg">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="rounded-full bg-[#553D8A]/10 p-3">
-                <ShoppingCart className="h-6 w-6 text-[#553D8A]" />
-              </div>
-              <h2 className="text-xl font-semibold text-gray-900">Purchase More</h2>
-            </div>
-            <div className="flex gap-2">
-              <CustomButton variant="outline" className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                Buy Credits
-              </CustomButton>
-              <CustomButton variant="outline" className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                Buy Unlocks
-              </CustomButton>
-            </div>
-          </div>
-          <p className="text-gray-600">Need more credits or unlocks? Purchase additional currency to enhance your experience.</p>
-        </div>
+        
+        <CurrenciesSection 
+          credits={subscription?.credits_available ?? 0}
+          unlocks={subscription?.unlocks_available ?? 0}
+        />
+        
+        <UnlockedCharactersSection 
+          characters={unlockedCharacters}
+        />
+        
+        <SubscriptionDetailsSection 
+          planType={subscription?.plan_type ?? 'Loading...'}
+          planEndsAt={subscription?.plan_ends_at ?? ''}
+        />
+        
+        <PurchaseSection />
       </div>
     </div>
   );
