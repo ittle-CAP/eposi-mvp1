@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -11,13 +10,17 @@ export const useSubscription = () => {
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError) throw userError;
 
+      console.log('Fetching subscription data...');
       // First, check if user has available unlocks
       const { data: subscription, error: subscriptionError } = await supabase
         .from('subscriptions')
         .select('unlocks_available')
+        .eq('user_id', userData.user.id)
         .single();
 
       if (subscriptionError) throw subscriptionError;
+
+      console.log('Current unlocks available:', subscription?.unlocks_available);
 
       if (!subscription || subscription.unlocks_available <= 0) {
         toast({
@@ -28,14 +31,16 @@ export const useSubscription = () => {
         return false;
       }
 
+      console.log('Updating subscription...');
       // Begin transaction by deducting an unlock
       const { error: updateError } = await supabase
         .from('subscriptions')
         .update({ unlocks_available: subscription.unlocks_available - 1 })
-        .neq('unlocks_available', 0);
+        .eq('user_id', userData.user.id);
 
       if (updateError) throw updateError;
 
+      console.log('Adding to unlocked characters...');
       // Add character to unlocked_characters
       const { error: unlockError } = await supabase
         .from('unlocked_characters')
@@ -45,7 +50,15 @@ export const useSubscription = () => {
           user_id: userData.user.id
         });
 
-      if (unlockError) throw unlockError;
+      if (unlockError) {
+        // If this fails, we should roll back the unlock deduction
+        console.error('Failed to add to unlocked_characters, rolling back...');
+        await supabase
+          .from('subscriptions')
+          .update({ unlocks_available: subscription.unlocks_available })
+          .eq('user_id', userData.user.id);
+        throw unlockError;
+      }
 
       toast({
         title: "Success",

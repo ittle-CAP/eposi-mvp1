@@ -4,6 +4,7 @@ import { Lock } from "lucide-react";
 import { CustomButton } from "@/components/ui/custom-button";
 import { useNavigate } from "react-router-dom";
 import { UnlockConfirmationDialog } from "@/components/characters/unlock-confirmation-dialog";
+import { useSubscription } from "@/hooks/use-subscription";
 
 interface Character {
   id: string;
@@ -18,18 +19,31 @@ interface Character {
 interface CharacterCardProps {
   character: Character;
   onClick: () => void;
+  onUnlock?: (character: Character) => void;
 }
 
-export const CharacterCard = ({ character, onClick }: CharacterCardProps) => {
+export const CharacterCard = ({ character, onClick, onUnlock }: CharacterCardProps) => {
   const navigate = useNavigate();
   const [showUnlockConfirmation, setShowUnlockConfirmation] = useState(false);
+  const { unlockCharacter } = useSubscription();
+
+  const handleUnlock = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowUnlockConfirmation(true);
+  };
+
+  const handleConfirmUnlock = async () => {
+    const success = await unlockCharacter(character.id, character.name);
+    if (success && onUnlock) {
+      onUnlock(character);
+    }
+    setShowUnlockConfirmation(false);
+  };
 
   const handleGenerateClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!character.isLocked) {
       navigate(`/generate?character=${character.id}`);
-    } else {
-      setShowUnlockConfirmation(true);
     }
   };
 
@@ -61,7 +75,7 @@ export const CharacterCard = ({ character, onClick }: CharacterCardProps) => {
           <CustomButton
             className="mt-2 w-full"
             variant={character.isLocked ? "outline" : "default"}
-            onClick={handleGenerateClick}
+            onClick={character.isLocked ? handleUnlock : handleGenerateClick}
           >
             {character.isLocked ? "Unlock" : "Generate Video"}
           </CustomButton>
@@ -71,12 +85,10 @@ export const CharacterCard = ({ character, onClick }: CharacterCardProps) => {
       <UnlockConfirmationDialog
         isOpen={showUnlockConfirmation}
         onClose={() => setShowUnlockConfirmation(false)}
-        onConfirm={() => {
-          onClick();
-          setShowUnlockConfirmation(false);
-        }}
+        onConfirm={handleConfirmUnlock}
         characterName={character.name}
       />
     </>
   );
 };
+
