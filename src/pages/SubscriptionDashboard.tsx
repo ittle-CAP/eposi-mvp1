@@ -1,8 +1,10 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { CreditCard, User, Settings, Plus, ShoppingCart } from "lucide-react";
 import { CustomButton } from "@/components/ui/custom-button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface UnlockedCharacter {
   id: string;
@@ -11,9 +13,14 @@ interface UnlockedCharacter {
   lastUsed: string;
 }
 
+interface Subscription {
+  plan_type: string;
+  credits_available: number;
+  plan_ends_at: string;
+}
+
 const SubscriptionDashboard = () => {
-  // Example data (in a real app, this would come from your backend)
-  const [credits] = useState(3);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [unlockedCharacters] = useState<UnlockedCharacter[]>([
     {
       id: "1",
@@ -28,6 +35,39 @@ const SubscriptionDashboard = () => {
       lastUsed: "2024-01-10",
     },
   ]);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      try {
+        const { data: subscriptionData, error } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .single();
+
+        if (error) {
+          console.error('Error fetching subscription:', error);
+          toast({
+            title: "Error",
+            description: "Failed to load subscription data",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        setSubscription(subscriptionData);
+      } catch (err) {
+        console.error('Error:', err);
+        toast({
+          title: "Error",
+          description: "Something went wrong",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchSubscription();
+  }, [toast]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-8">
@@ -47,7 +87,9 @@ const SubscriptionDashboard = () => {
             </div>
             <div>
               <h2 className="text-xl font-semibold text-gray-900">Available Credits</h2>
-              <p className="text-3xl font-bold text-[#553D8A]">{credits} credits</p>
+              <p className="text-3xl font-bold text-[#553D8A]">
+                {subscription?.credits_available ?? 0} credits
+              </p>
             </div>
           </div>
         </div>
@@ -88,8 +130,12 @@ const SubscriptionDashboard = () => {
             <h2 className="text-xl font-semibold text-gray-900">Subscription Details</h2>
           </div>
           <div className="mb-6">
-            <p className="text-gray-600">Current Plan: <span className="font-medium">Basic</span></p>
-            <p className="text-sm text-gray-500">Renews on February 1st, 2024</p>
+            <p className="text-gray-600">
+              Current Plan: <span className="font-medium capitalize">{subscription?.plan_type ?? 'Loading...'}</span>
+            </p>
+            <p className="text-sm text-gray-500">
+              Renews on {subscription?.plan_ends_at ? new Date(subscription.plan_ends_at).toLocaleDateString() : 'Loading...'}
+            </p>
           </div>
           <CustomButton className="w-full flex items-center justify-center gap-2">
             <Plus className="h-4 w-4" />

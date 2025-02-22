@@ -39,6 +39,47 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string | null
+          credits_available: number
+          id: string
+          plan_ends_at: string | null
+          plan_started_at: string | null
+          plan_type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          credits_available?: number
+          id?: string
+          plan_ends_at?: string | null
+          plan_started_at?: string | null
+          plan_type?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          credits_available?: number
+          id?: string
+          plan_ends_at?: string | null
+          plan_started_at?: string | null
+          plan_type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
