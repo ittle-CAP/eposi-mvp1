@@ -17,20 +17,20 @@ const Characters = () => {
   const { unlockCharacter } = useSubscription();
   const { toast } = useToast();
 
+  const fetchUnlockedCharacters = async () => {
+    const { data, error } = await supabase
+      .from('unlocked_characters')
+      .select('character_id');
+    
+    if (error) {
+      console.error('Error fetching unlocked characters:', error);
+      return;
+    }
+
+    setUnlockedCharacterIds(data.map(char => char.character_id));
+  };
+
   useEffect(() => {
-    const fetchUnlockedCharacters = async () => {
-      const { data, error } = await supabase
-        .from('unlocked_characters')
-        .select('character_id');
-      
-      if (error) {
-        console.error('Error fetching unlocked characters:', error);
-        return;
-      }
-
-      setUnlockedCharacterIds(data.map(char => char.character_id));
-    };
-
     fetchUnlockedCharacters();
   }, []);
 
@@ -113,7 +113,7 @@ const Characters = () => {
     
     const success = await unlockCharacter(character.id, character.name);
     if (success) {
-      setUnlockedCharacterIds([...unlockedCharacterIds, character.id]);
+      await fetchUnlockedCharacters(); // Refresh the unlocked characters list
       toast({
         title: "Character Unlocked",
         description: `${character.name} has been successfully unlocked!`,
