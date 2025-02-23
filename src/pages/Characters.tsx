@@ -1,112 +1,29 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { CharacterDialog } from "@/components/character-dialog";
 import { SearchFilter } from "@/components/characters/search-filter";
 import { CharacterGrid } from "@/components/characters/character-grid";
 import { Header } from "@/components/navigation/header";
-import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/use-subscription";
+import { useCharacters } from "@/hooks/use-characters";
+import { useCharacterFilter } from "@/hooks/use-character-filter";
 import { Character } from "@/types/character";
 import { useToast } from "@/hooks/use-toast";
 
 const Characters = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedGenre, setSelectedGenre] = useState("");
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
-  const [unlockedCharacterIds, setUnlockedCharacterIds] = useState<string[]>([]);
+  const { characters, unlockedCharacterIds, fetchUnlockedCharacters } = useCharacters();
   const { unlockCharacter } = useSubscription();
   const { toast } = useToast();
-
-  const fetchUnlockedCharacters = async () => {
-    const { data, error } = await supabase
-      .from('unlocked_characters')
-      .select('character_id');
-    
-    if (error) {
-      console.error('Error fetching unlocked characters:', error);
-      return;
-    }
-
-    setUnlockedCharacterIds(data.map(char => char.character_id));
-  };
-
-  useEffect(() => {
-    fetchUnlockedCharacters();
-  }, []);
-
-  const characters: Character[] = [
-    {
-      id: "1",
-      name: "Luna",
-      genre: "Fantasy",
-      imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
-      isLocked: !unlockedCharacterIds.includes("1"),
-      description: "A mystical character with the power to control dreams and nightmares.",
-      unlocks: 1523,
-    },
-    {
-      id: "2",
-      name: "Neo",
-      genre: "Sci-fi",
-      imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
-      isLocked: !unlockedCharacterIds.includes("2"),
-      description: "A digital warrior fighting against the machine world.",
-      unlocks: 2891,
-    },
-    {
-      id: "3",
-      name: "Whiskers",
-      genre: "Anime",
-      imageUrl: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-      isLocked: !unlockedCharacterIds.includes("3"),
-      description: "A magical cat with nine lives and the ability to speak to humans.",
-      unlocks: 943,
-    },
-    {
-      id: "4",
-      name: "BuzzBot",
-      genre: "Gaming",
-      imageUrl: "https://images.unsplash.com/photo-1498936178812-4b2e558d2937",
-      isLocked: !unlockedCharacterIds.includes("4"),
-      description: "A quirky robot character from the hit game 'Digital Dreams'.",
-      unlocks: 3156,
-    },
-    {
-      id: "5",
-      name: "Detective Smith",
-      genre: "Television",
-      imageUrl: "https://images.unsplash.com/photo-1721322800607-8c38375eef04",
-      isLocked: !unlockedCharacterIds.includes("5"),
-      description: "A brilliant detective with an uncanny ability to solve impossible cases.",
-      unlocks: 756,
-    },
-    {
-      id: "6",
-      name: "Savanna",
-      genre: "Film",
-      imageUrl: "https://images.unsplash.com/photo-1466721591366-2d5fba72006d",
-      isLocked: !unlockedCharacterIds.includes("6"),
-      description: "A wildlife conservationist who can communicate with animals.",
-      unlocks: 1892,
-    },
-    {
-      id: "7",
-      name: "Mountain King",
-      genre: "Fantasy",
-      imageUrl: "https://images.unsplash.com/photo-1438565434616-3ef039228b15",
-      isLocked: !unlockedCharacterIds.includes("7"),
-      description: "The legendary ruler of the mountain realms, wielding ancient magic.",
-      unlocks: 2341,
-    }
-  ];
-
-  const filteredCharacters = characters.filter((character) => {
-    const matchesSearch = character.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesGenre = !selectedGenre || selectedGenre === "all" || character.genre === selectedGenre;
-    return matchesSearch && matchesGenre;
-  });
-
-  const genres = ["All", "Fantasy", "Sci-fi", "Anime", "Gaming", "Television", "Film"];
+  
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedGenre,
+    setSelectedGenre,
+    filteredCharacters,
+    genres
+  } = useCharacterFilter(characters);
 
   const handleUnlockCharacter = async (character: Character) => {
     if (!character.isLocked) return;
