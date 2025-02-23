@@ -16,21 +16,21 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#1A1F2C] to-white">
       <Header />
 
       {/* Hero Section */}
       <section className="relative">
         <div className="absolute inset-0 z-0">
           <img
-            src="/lovable-uploads/ae567c08-0654-4dfa-977b-eeb6a85ec1e4.png"
-            alt="Hero background"
+            src="/lovable-uploads/9d2f5aa3-5aba-45fe-9236-96bf12782e8e.png"
+            alt="Misty lake with boat and church"
             className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-[#1A1F2C]" />
         </div>
 
-        <div className="container relative z-10 mx-auto px-4 pt-32 text-center">
+        <div className="container relative z-10 mx-auto px-4 pt-32 pb-48 text-center">
           <div className="mx-auto max-w-3xl">
             <div className={`transform transition-all duration-1000 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}>
               <h1 className="mb-6 text-5xl font-bold text-white sm:text-6xl">
@@ -43,7 +43,7 @@ const Index = () => {
                 <CustomButton 
                   size="lg" 
                   className="h-14 px-12 text-lg" 
-                  onClick={() => !user && navigate("/auth")}
+                  onClick={() => !user ? navigate("/auth") : navigate("/create")}
                 >
                   {user ? "Start Creating" : "Sign Up to Start"}
                 </CustomButton>
@@ -54,8 +54,8 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="container mx-auto px-4 py-24">
-        <div className="grid gap-8 md:grid-cols-3">
+      <section className="container relative z-20 mx-auto px-4">
+        <div className="grid -mt-24 gap-8 md:grid-cols-3">
           <FeatureCard
             icon="skills"
             title="No Technical Skills Needed"

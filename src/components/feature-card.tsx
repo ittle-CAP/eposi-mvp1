@@ -17,7 +17,7 @@ const FeatureCard = ({ title, description, icon }: FeatureCardProps) => {
   }[icon];
 
   return (
-    <div className="group relative overflow-hidden rounded-xl bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl">
+    <div className="group relative overflow-hidden rounded-xl bg-white/95 backdrop-blur-sm p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-white">
       <div className="relative z-10 transition-all duration-300 group-hover:-translate-y-24">
         <div className="mb-4 inline-flex rounded-lg bg-[#553D8A]/10 p-3 text-[#553D8A]">
           <Icon className="h-6 w-6" />
