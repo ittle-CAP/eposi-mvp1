@@ -70,36 +70,36 @@ const Index = () => {
       {/* Community Section */}
       <section className="container mx-auto px-4 py-24">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="mb-6 text-3xl font-bold text-gray-900">Join Our Community</h2>
+          <h2 className="mb-6 text-4xl font-bold text-gray-900">Join Our Community</h2>
           <p className="mb-12 text-lg text-gray-600">Connect with fellow creators and stay updated with the latest news and features.</p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <CustomButton 
               onClick={() => window.open('https://discord.gg/your-discord', '_blank')}
               size="lg" 
-              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#5865F2] hover:bg-[#4752C4]"
+              className="w-full sm:w-auto min-w-[200px] flex items-center justify-center gap-3 bg-[#5865F2] hover:bg-[#4752C4] shadow-lg hover:shadow-xl transform transition-all duration-200 hover:-translate-y-1 text-white font-semibold py-6"
             >
-              <MessageSquare className="w-5 h-5" />
-              Join Discord
+              <MessageSquare className="w-6 h-6" />
+              <span>Join Discord</span>
             </CustomButton>
             
             <CustomButton 
               onClick={() => window.open('https://instagram.com/your-instagram', '_blank')}
               size="lg" 
-              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#E4405F] hover:bg-[#D63251]"
+              className="w-full sm:w-auto min-w-[200px] flex items-center justify-center gap-3 bg-gradient-to-r from-[#E4405F] to-[#FD1D1D] hover:from-[#D63251] hover:to-[#E31D1D] shadow-lg hover:shadow-xl transform transition-all duration-200 hover:-translate-y-1 text-white font-semibold py-6"
             >
-              <Instagram className="w-5 h-5" />
-              Follow on Instagram
+              <Instagram className="w-6 h-6" />
+              <span>Follow on Instagram</span>
             </CustomButton>
             
             <CustomButton 
               onClick={() => navigate("/newsletter")}
               size="lg" 
               variant="outline"
-              className="w-full sm:w-auto flex items-center justify-center gap-2 border-[#553D8A] text-[#553D8A] hover:bg-[#553D8A] hover:text-white"
+              className="w-full sm:w-auto min-w-[200px] flex items-center justify-center gap-3 border-2 border-[#553D8A] text-[#553D8A] hover:bg-[#553D8A] hover:text-white shadow-lg hover:shadow-xl transform transition-all duration-200 hover:-translate-y-1 font-semibold py-6"
             >
-              <Mail className="w-5 h-5" />
-              Join Newsletter
+              <Mail className="w-6 h-6" />
+              <span>Join Newsletter</span>
             </CustomButton>
           </div>
         </div>
