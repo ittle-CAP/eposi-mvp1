@@ -24,13 +24,15 @@ export const Header = () => {
             <Link to="/community" className="text-sm font-medium text-gray-600 hover:text-gray-900">
               Community
             </Link>
-            <CustomButton 
-              onClick={() => window.location.href = "/create"}
-              size="sm"
-              className="bg-[#553D8A] text-white hover:bg-[#553D8A]/90"
-            >
-              Create
-            </CustomButton>
+            {user && (
+              <CustomButton 
+                onClick={() => window.location.href = "/generate"}
+                size="sm"
+                className="bg-[#553D8A] text-white hover:bg-[#553D8A]/90"
+              >
+                Create
+              </CustomButton>
+            )}
           </nav>
           <UserNav />
         </div>

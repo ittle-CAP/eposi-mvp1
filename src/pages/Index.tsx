@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CustomButton } from "@/components/ui/custom-button";
@@ -36,7 +35,7 @@ const Index = () => {
                 Create Stunning Videos and Images with Professional Characters, All Fully Licensed and Ready For Your AI Projects.
               </p>
               <div className="flex justify-center">
-                <CustomButton size="lg" className="h-14 px-12 text-lg" onClick={() => !user ? navigate("/auth") : navigate("/create")}>
+                <CustomButton size="lg" className="h-14 px-12 text-lg" onClick={() => !user ? navigate("/auth") : navigate("/generate")}>
                   {user ? "Start Creating" : "Sign Up to Start"}
                 </CustomButton>
               </div>
