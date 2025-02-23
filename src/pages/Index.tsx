@@ -1,19 +1,23 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CustomButton } from "@/components/ui/custom-button";
 import { FeatureCard } from "@/components/feature-card";
 import { Header } from "@/components/navigation/header";
 import { useAuth } from "@/components/AuthProvider";
+import { Discord, Instagram, Mail } from "lucide-react";
+
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
+
   useEffect(() => {
     setIsVisible(true);
   }, []);
-  return <div className="min-h-screen bg-gradient-to-b from-[#1A1F2C] to-white">
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#1A1F2C] to-white">
       <Header />
 
       {/* Hero Section */}
@@ -45,22 +49,63 @@ const Index = () => {
       {/* Features Section */}
       <section className="container relative z-20 mx-auto px-4">
         <div className="grid -mt-24 gap-8 md:grid-cols-3">
-          <FeatureCard icon="skills" title="No Technical Skills Needed" description="Create professional content with any additional data files or technical expertise" />
-          <FeatureCard icon="ai" title="AI-Powered Creation" description="Leverage cutting-edge AI technology to bring your characters to life." />
-          <FeatureCard icon="security" title="Legal & Secure" description="All characters are fully licensed and ready for respective usage" />
+          <FeatureCard
+            icon="skills"
+            title="No Technical Skills Needed"
+            description="Create professional content with any additional data files or technical expertise."
+          />
+          <FeatureCard
+            icon="ai"
+            title="AI-Powered Creation"
+            description="Leverage cutting-edge AI technology to bring your characters to life."
+          />
+          <FeatureCard
+            icon="security"
+            title="Legal & Secure"
+            description="All characters are fully licensed and ready for respective usage."
+          />
         </div>
       </section>
 
-      {/* Additional Content Section */}
+      {/* Community Section */}
       <section className="container mx-auto px-4 py-24">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="mb-6 text-3xl font-bold text-gray-900">Connect with Creators</h2>
-          <p className="mb-8 text-lg text-gray-600">Join our creator community and collaborate with other creatives to bring your stories to life with our AI-powered platform.</p>
-          <CustomButton onClick={() => !user ? navigate("/auth") : navigate("/create")} size="lg" className="bg-[#553D8A] text-white hover:bg-[#553D8A]/90">
-            Get Started
-          </CustomButton>
+          <h2 className="mb-6 text-3xl font-bold text-gray-900">Join Our Community</h2>
+          <p className="mb-12 text-lg text-gray-600">Connect with fellow creators and stay updated with the latest news and features.</p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <CustomButton 
+              onClick={() => window.open('https://discord.gg/your-discord', '_blank')}
+              size="lg" 
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#5865F2] hover:bg-[#4752C4]"
+            >
+              <Discord className="w-5 h-5" />
+              Join Discord
+            </CustomButton>
+            
+            <CustomButton 
+              onClick={() => window.open('https://instagram.com/your-instagram', '_blank')}
+              size="lg" 
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#E4405F] hover:bg-[#D63251]"
+            >
+              <Instagram className="w-5 h-5" />
+              Follow on Instagram
+            </CustomButton>
+            
+            <CustomButton 
+              onClick={() => navigate("/newsletter")}
+              size="lg" 
+              variant="outline"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 border-[#553D8A] text-[#553D8A] hover:bg-[#553D8A] hover:text-white"
+            >
+              <Mail className="w-5 h-5" />
+              Join Newsletter
+            </CustomButton>
+          </div>
         </div>
       </section>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
