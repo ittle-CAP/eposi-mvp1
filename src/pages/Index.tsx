@@ -55,7 +55,7 @@ const Index = () => {
       <section className="container mx-auto px-4 py-24">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="mb-6 text-3xl font-bold text-gray-900">Connect with Creators</h2>
-          <p className="mb-8 text-lg text-gray-600">Join our community of creators and collaborate to bring your stories to life with our AI-powered platform.</p>
+          <p className="mb-8 text-lg text-gray-600">Join our creator community and collaborate with other creatives to bring your stories to life with our AI-powered platform.</p>
           <CustomButton onClick={() => !user ? navigate("/auth") : navigate("/create")} size="lg" className="bg-[#553D8A] text-white hover:bg-[#553D8A]/90">
             Get Started
           </CustomButton>
