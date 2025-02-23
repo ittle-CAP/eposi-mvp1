@@ -1,7 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { UserRound, CreditCard, LayoutDashboard, Users, Video } from "lucide-react";
+import { CreditCard, LayoutDashboard, Users, UserRound, Home, Users2 } from "lucide-react";
 import { CustomButton } from "@/components/ui/custom-button";
 import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useEffect, useState } from "react";
 
 interface UserCredits {
   credits_available: number;
@@ -67,9 +67,9 @@ export const UserNav = () => {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/subscription" className="flex w-full cursor-pointer items-center">
-                  <LayoutDashboard className="mr-2 h-4 w-4" />
-                  <span>My Dashboard</span>
+                <Link to="/" className="flex w-full cursor-pointer items-center">
+                  <Home className="mr-2 h-4 w-4" />
+                  <span>Home</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
@@ -79,9 +79,15 @@ export const UserNav = () => {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/generate" className="flex w-full cursor-pointer items-center">
-                  <Video className="mr-2 h-4 w-4" />
-                  <span>Create</span>
+                <Link to="/community" className="flex w-full cursor-pointer items-center">
+                  <Users2 className="mr-2 h-4 w-4" />
+                  <span>Community</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/subscription" className="flex w-full cursor-pointer items-center">
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <span>Dashboard</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />

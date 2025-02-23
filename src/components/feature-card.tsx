@@ -9,7 +9,7 @@ interface FeatureCardProps {
   className?: string;
 }
 
-const FeatureCard = ({ title, description, icon, className }: FeatureCardProps) => {
+const FeatureCard = ({ title, description, icon }: FeatureCardProps) => {
   const Icon = {
     skills: UserRound,
     ai: Brain,
@@ -17,18 +17,14 @@ const FeatureCard = ({ title, description, icon, className }: FeatureCardProps) 
   }[icon];
 
   return (
-    <div
-      className={cn(
-        "group relative overflow-hidden rounded-xl bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl",
-        "before:absolute before:inset-0 before:z-0 before:bg-gradient-to-br before:from-white/40 before:to-white/60 before:backdrop-blur-xl",
-        className
-      )}
-    >
-      <div className="relative z-10">
-        <div className="mb-4 inline-flex rounded-lg bg-[#553D8A]/10 p-3 text-[#553D8A] transition-transform duration-300 group-hover:scale-110">
+    <div className="group relative overflow-hidden rounded-xl bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl">
+      <div className="relative z-10 transition-all duration-300 group-hover:-translate-y-24">
+        <div className="mb-4 inline-flex rounded-lg bg-[#553D8A]/10 p-3 text-[#553D8A]">
           <Icon className="h-6 w-6" />
         </div>
         <h3 className="mb-2 text-lg font-semibold text-gray-900">{title}</h3>
+      </div>
+      <div className="absolute inset-x-0 bottom-0 z-10 bg-white p-6 transition-all duration-300 group-hover:translate-y-0 translate-y-full">
         <p className="text-sm text-gray-600">{description}</p>
       </div>
     </div>
