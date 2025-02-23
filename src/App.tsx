@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/components/AuthProvider";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Characters from "./pages/Characters";
@@ -25,8 +26,16 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/characters" element={<Characters />} />
-            <Route path="/subscription" element={<SubscriptionDashboard />} />
-            <Route path="/generate" element={<VideoGeneration />} />
+            <Route path="/subscription" element={
+              <ProtectedRoute>
+                <SubscriptionDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/generate" element={
+              <ProtectedRoute>
+                <VideoGeneration />
+              </ProtectedRoute>
+            } />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

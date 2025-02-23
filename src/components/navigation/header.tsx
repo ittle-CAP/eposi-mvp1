@@ -18,9 +18,11 @@ export const Header = () => {
             <Link to="/characters" className="text-sm font-medium text-gray-600 hover:text-gray-900">
               Browse Characters
             </Link>
-            <Link to="/subscription" className="text-sm font-medium text-gray-600 hover:text-gray-900">
-              Dashboard
-            </Link>
+            {user && (
+              <Link to="/subscription" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+                Dashboard
+              </Link>
+            )}
             <Link to="/community" className="text-sm font-medium text-gray-600 hover:text-gray-900">
               Community
             </Link>
