@@ -33,7 +33,8 @@ export const CharacterCard = ({ character, onClick, onUnlock }: CharacterCardPro
   };
 
   const handleConfirmUnlock = async () => {
-    const success = await unlockCharacter(character.id, character.name);
+    console.log('Unlocking character with image URL:', character.imageUrl);
+    const success = await unlockCharacter(character.id, character.name, character.imageUrl);
     if (success && onUnlock) {
       onUnlock(character);
     }
@@ -91,4 +92,3 @@ export const CharacterCard = ({ character, onClick, onUnlock }: CharacterCardPro
     </>
   );
 };
-
