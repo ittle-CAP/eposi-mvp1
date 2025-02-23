@@ -5,7 +5,7 @@ import { CustomButton } from "@/components/ui/custom-button";
 import { FeatureCard } from "@/components/feature-card";
 import { Header } from "@/components/navigation/header";
 import { useAuth } from "@/components/AuthProvider";
-import { Discord, Instagram, Mail } from "lucide-react";
+import { MessageSquare, Instagram, Mail } from "lucide-react";
 
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -79,7 +79,7 @@ const Index = () => {
               size="lg" 
               className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#5865F2] hover:bg-[#4752C4]"
             >
-              <Discord className="w-5 h-5" />
+              <MessageSquare className="w-5 h-5" />
               Join Discord
             </CustomButton>
             
