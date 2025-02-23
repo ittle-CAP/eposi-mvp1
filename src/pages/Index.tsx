@@ -59,7 +59,7 @@ const Index = () => {
           <FeatureCard
             icon="skills"
             title="No Technical Skills Needed"
-            description="Create professional content without any coding or technical expertise required."
+            description="Create professional content with any additional data files or technical expertise"
           />
           <FeatureCard
             icon="ai"
@@ -69,7 +69,7 @@ const Index = () => {
           <FeatureCard
             icon="security"
             title="Legal & Secure"
-            description="All characters are fully licensed and ready for commercial use."
+            description="All characters are fully licensed and ready for respective usage"
           />
         </div>
       </section>
