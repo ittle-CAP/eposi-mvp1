@@ -77,29 +77,29 @@ const Index = () => {
             <CustomButton 
               onClick={() => window.open('https://discord.gg/your-discord', '_blank')}
               size="lg" 
-              className="w-full sm:w-auto min-w-[200px] flex items-center justify-center gap-3 bg-[#5865F2] hover:bg-[#4752C4] shadow-lg hover:shadow-xl transform transition-all duration-200 hover:-translate-y-1 text-white font-semibold py-6"
+              className="w-full sm:w-auto min-w-[200px] inline-flex items-center justify-center gap-2 bg-[#5865F2] hover:bg-[#4752C4] shadow-lg hover:shadow-xl transform transition-all duration-200 hover:-translate-y-1 text-white font-semibold py-6"
             >
-              <MessageSquare className="w-6 h-6" />
-              <span>Join Discord</span>
+              <MessageSquare className="h-5 w-5" aria-hidden="true" />
+              Join Discord
             </CustomButton>
             
             <CustomButton 
               onClick={() => window.open('https://instagram.com/your-instagram', '_blank')}
               size="lg" 
-              className="w-full sm:w-auto min-w-[200px] flex items-center justify-center gap-3 bg-gradient-to-r from-[#E4405F] to-[#FD1D1D] hover:from-[#D63251] hover:to-[#E31D1D] shadow-lg hover:shadow-xl transform transition-all duration-200 hover:-translate-y-1 text-white font-semibold py-6"
+              className="w-full sm:w-auto min-w-[200px] inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#E4405F] to-[#FD1D1D] hover:from-[#D63251] hover:to-[#E31D1D] shadow-lg hover:shadow-xl transform transition-all duration-200 hover:-translate-y-1 text-white font-semibold py-6"
             >
-              <Instagram className="w-6 h-6" />
-              <span>Follow on Instagram</span>
+              <Instagram className="h-5 w-5" aria-hidden="true" />
+              Follow on Instagram
             </CustomButton>
             
             <CustomButton 
               onClick={() => navigate("/newsletter")}
               size="lg" 
               variant="outline"
-              className="w-full sm:w-auto min-w-[200px] flex items-center justify-center gap-3 border-2 border-[#553D8A] text-[#553D8A] hover:bg-[#553D8A] hover:text-white shadow-lg hover:shadow-xl transform transition-all duration-200 hover:-translate-y-1 font-semibold py-6"
+              className="w-full sm:w-auto min-w-[200px] inline-flex items-center justify-center gap-2 border-2 border-[#553D8A] text-[#553D8A] hover:bg-[#553D8A] hover:text-white shadow-lg hover:shadow-xl transform transition-all duration-200 hover:-translate-y-1 font-semibold py-6"
             >
-              <Mail className="w-6 h-6" />
-              <span>Join Newsletter</span>
+              <Mail className="h-5 w-5" aria-hidden="true" />
+              Join Newsletter
             </CustomButton>
           </div>
         </div>
