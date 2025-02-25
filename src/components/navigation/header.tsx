@@ -9,11 +9,11 @@ export const Header = () => {
 
   return (
     <header className="fixed top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-lg">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="container mx-auto flex h-16 items-center justify-between px-6 md:px-8 max-w-[1400px]">
         <Link to="/" className="text-xl font-semibold text-gray-900">
           Saga
         </Link>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 pr-4">
           <nav className="hidden items-center gap-6 md:flex">
             <Link to="/characters" className="text-sm font-medium text-gray-600 hover:text-gray-900">
               Browse Characters
