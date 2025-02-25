@@ -1,11 +1,12 @@
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { UserNav } from "./user-nav";
 import { useAuth } from "@/components/AuthProvider";
 import { CustomButton } from "@/components/ui/custom-button";
 
 export const Header = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <header className="fixed top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-lg">
@@ -28,7 +29,7 @@ export const Header = () => {
             </Link>
             {user && (
               <CustomButton 
-                onClick={() => window.location.href = "/generate"}
+                onClick={() => navigate("/generate")}
                 size="sm"
                 className="bg-[#553D8A] text-white hover:bg-[#553D8A]/90"
               >
