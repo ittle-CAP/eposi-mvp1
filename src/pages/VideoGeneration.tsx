@@ -145,17 +145,27 @@ const VideoGeneration = () => {
       <div className="container mx-auto max-w-4xl px-4 pt-24">
         <h1 className="mb-8 text-center text-4xl font-bold text-gray-900">AI Content Generator</h1>
 
-        <Tabs defaultValue="video" className="w-full">
+        <Tabs defaultValue="image" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="video" className="flex items-center gap-2">
-              <Video className="h-4 w-4" />
-              Video Generation
-            </TabsTrigger>
             <TabsTrigger value="image" className="flex items-center gap-2">
               <Image className="h-4 w-4" />
               Image Generation
             </TabsTrigger>
+            <TabsTrigger value="video" className="flex items-center gap-2">
+              <Video className="h-4 w-4" />
+              Video Generation
+            </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="image" className="rounded-lg bg-white p-6 shadow-lg">
+            <ImageGenerationForm
+              prompt={prompt}
+              setPrompt={setPrompt}
+              isGenerating={isGenerating}
+              handleGenerate={handleImageGenerate}
+              generatedImageUrl={generatedImageUrl}
+            />
+          </TabsContent>
 
           <TabsContent value="video" className="rounded-lg bg-white p-6 shadow-lg">
             <VideoGenerationForm
@@ -167,16 +177,6 @@ const VideoGeneration = () => {
               handleGenerate={handleVideoGenerate}
               generatedVideoUrl={generatedVideoUrl}
               unlockedCharacters={unlockedCharacters}
-            />
-          </TabsContent>
-
-          <TabsContent value="image" className="rounded-lg bg-white p-6 shadow-lg">
-            <ImageGenerationForm
-              prompt={prompt}
-              setPrompt={setPrompt}
-              isGenerating={isGenerating}
-              handleGenerate={handleImageGenerate}
-              generatedImageUrl={generatedImageUrl}
             />
           </TabsContent>
         </Tabs>
