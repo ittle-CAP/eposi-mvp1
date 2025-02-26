@@ -13,6 +13,7 @@ import { ImageGenerationForm } from "@/components/generation/ImageGenerationForm
 const VideoGeneration = () => {
   const [searchParams] = useSearchParams();
   const [selectedCharacter, setSelectedCharacter] = useState<string>("");
+  const [selectedImage, setSelectedImage] = useState<string>("");
   const [prompt, setPrompt] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string>("");
@@ -173,14 +174,13 @@ const VideoGeneration = () => {
 
           <TabsContent value="video" className="rounded-lg bg-white p-6 shadow-lg">
             <VideoGenerationForm
-              selectedCharacter={selectedCharacter}
-              setSelectedCharacter={setSelectedCharacter}
               prompt={prompt}
               setPrompt={setPrompt}
               isGenerating={isGenerating}
               handleGenerate={handleVideoGenerate}
               generatedVideoUrl={generatedVideoUrl}
-              unlockedCharacters={unlockedCharacters}
+              selectedImage={selectedImage}
+              setSelectedImage={setSelectedImage}
             />
           </TabsContent>
         </Tabs>
