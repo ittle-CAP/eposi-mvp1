@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Video, Image } from "lucide-react";
@@ -159,11 +160,14 @@ const VideoGeneration = () => {
 
           <TabsContent value="image" className="rounded-lg bg-white p-6 shadow-lg">
             <ImageGenerationForm
+              selectedCharacter={selectedCharacter}
+              setSelectedCharacter={setSelectedCharacter}
               prompt={prompt}
               setPrompt={setPrompt}
               isGenerating={isGenerating}
               handleGenerate={handleImageGenerate}
               generatedImageUrl={generatedImageUrl}
+              unlockedCharacters={unlockedCharacters}
             />
           </TabsContent>
 
