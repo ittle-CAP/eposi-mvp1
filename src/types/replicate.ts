@@ -11,6 +11,7 @@ export interface ReplicateGenerationOptions {
   guidanceScale?: number;
   modelVersion?: string;
   scheduler?: "DDIM" | "DPMSolverMultistep" | "K_EULER" | "K_EULER_ANCESTRAL" | "PNDM";
+  seed?: number;
 }
 
 export interface ReplicateResponse {

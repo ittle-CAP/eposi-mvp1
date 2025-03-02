@@ -14,9 +14,16 @@ export const startImageGeneration = async (options: ReplicateGenerationOptions):
     steps: options.steps || 30,
     guidanceScale: options.guidanceScale || 7.5,
     scheduler: options.scheduler || "K_EULER_ANCESTRAL", // Better for detailed images
-    modelVersion: options.modelVersion,
+    modelVersion: "black-forest-labs/flux-dev-lora", // Changed to use the new model
     negative_prompt: options.negativePrompt || "ugly, blurry, low quality, distorted, disfigured"
   };
+  
+  // Add random seed if not provided
+  if (options.seed) {
+    body.seed = options.seed;
+  } else {
+    body.seed = Math.floor(Math.random() * 2147483647);
+  }
   
   // Only include LoRA options if a LoRA URL is provided
   if (options.loraUrl) {
@@ -25,6 +32,9 @@ export const startImageGeneration = async (options: ReplicateGenerationOptions):
     console.log(`Using LoRA with URL: ${options.loraUrl} and strength: ${options.loraStrength || 0.7}`);
   } else {
     console.log("No LoRA specified, using base model");
+    // Explicitly set empty LoRA parameters to ensure clean generation
+    body.loraUrl = "";
+    body.loraStrength = 0;
   }
   
   try {

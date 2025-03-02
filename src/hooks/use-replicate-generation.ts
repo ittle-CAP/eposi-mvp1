@@ -79,6 +79,11 @@ export const useReplicateGeneration = () => {
         options.steps = 30;
       }
       
+      // Add a random seed if none provided for reproducibility
+      if (!options.seed) {
+        options.seed = Math.floor(Math.random() * 2147483647);
+      }
+      
       console.log("Starting image generation with options:", options);
       const response = await startImageGeneration(options);
 

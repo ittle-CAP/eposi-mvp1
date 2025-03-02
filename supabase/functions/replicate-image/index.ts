@@ -94,68 +94,52 @@ serve(async (req) => {
     // Setup the base input
     const input: Record<string, any> = {
       prompt: body.prompt,
-      negative_prompt: body.negativePrompt || "",
+      negative_prompt: body.negative_prompt || "",
       width: body.width || 512,
       height: body.height || 512,
       num_outputs: body.numOutputs || 1,
-      scheduler: body.scheduler || "K_EULER",
+      scheduler: body.scheduler || "K_EULER_ANCESTRAL",
       num_inference_steps: body.steps || 30,
       guidance_scale: body.guidanceScale || 7.5,
+      seed: body.seed || Math.floor(Math.random() * 2147483647),
     };
     
     let prediction;
     
-    // If there's a LoRA URL, use the cloneofsimo/lora model
-    if (body.loraUrl) {
-      console.log("Using cloneofsimo/lora model with LoRA:", body.loraUrl, "strength:", body.loraStrength || 0.7);
-      
-      try {
-        // Updated to a currently valid model version for LoRA
-        prediction = await replicate.predictions.create({
-          version: "6677de4c1108133a4c1837da1da9c8bbaea6b2c2836970f0fb7c83443869eda5", // Updated LoRA model version
-          input: {
-            ...input,
-            lora_urls: body.loraUrl,
-            lora_scales: body.loraStrength || 0.7,
-          }
-        });
-      } catch (loraError) {
-        console.error("Error creating LoRA prediction:", loraError);
-        return new Response(JSON.stringify({ 
-          error: "Failed to create LoRA prediction",
-          details: loraError.message 
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500,
-        });
-      }
+    // We're using the flux-dev-lora model for all requests
+    const modelVersion = "black-forest-labs/flux-dev-lora";
+    
+    // If there's a LoRA URL, add it to the input
+    if (body.loraUrl && body.loraUrl.trim() !== "") {
+      console.log(`Using model ${modelVersion} with LoRA: ${body.loraUrl}, strength: ${body.loraStrength || 0.7}`);
+      input.lora_url = body.loraUrl;
+      input.lora_scale = body.loraStrength || 0.7;
     } else {
-      // Fallback to standard Stability AI model
-      console.log("Using standard Stability AI model - explicitly with NO LoRAs");
-      try {
-        // Updated to a currently valid model version for SDXL
-        prediction = await replicate.predictions.create({
-          version: "39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b", // Updated SDXL model version
-          input: {
-            ...input,
-            // Explicitly set empty LoRA parameters to override any defaults
-            lora_urls: "",
-            lora_scales: 0
-          }
-        });
-      } catch (sdxlError) {
-        console.error("Error creating SDXL prediction:", sdxlError);
-        return new Response(JSON.stringify({ 
-          error: "Failed to create SDXL prediction",
-          details: sdxlError.message 
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500,
-        });
-      }
+      console.log(`Using model ${modelVersion} with NO LoRAs`);
+      // Explicitly set empty LoRA parameters to ensure clean generation
+      input.lora_url = "";
+      input.lora_scale = 0;
+    }
+    
+    try {
+      // Create prediction with the flux-dev-lora model
+      prediction = await replicate.predictions.create({
+        version: modelVersion,
+        input: input
+      });
+      
+      console.log("Prediction created:", prediction);
+    } catch (error) {
+      console.error(`Error creating prediction with ${modelVersion}:`, error);
+      return new Response(JSON.stringify({ 
+        error: `Failed to create prediction with ${modelVersion}`,
+        details: error.message 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      });
     }
 
-    console.log("Prediction created:", prediction);
     return new Response(JSON.stringify(prediction), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
