@@ -25,55 +25,78 @@ export const startImageGeneration = async (options: ReplicateGenerationOptions):
     body.negativePrompt = options.negativePrompt;
   }
   
-  const { data, error } = await supabase.functions.invoke("replicate-image", {
-    body: body
-  });
+  try {
+    console.log("Invoking replicate-image function with body:", body);
+    const { data, error } = await supabase.functions.invoke("replicate-image", {
+      body: body
+    });
 
-  if (error) {
-    console.error("Error from Supabase function:", error);
-    throw new Error(`Error starting generation: ${error.message}`);
+    if (error) {
+      console.error("Error from Supabase function:", error);
+      // Extract more detailed error information if available
+      let errorMessage = `Error starting generation: ${error.message}`;
+      console.log("Full error object:", JSON.stringify(error));
+      
+      throw new Error(errorMessage);
+    }
+
+    console.log("Response from replicate-image function:", data);
+
+    if (!data || !data.id) {
+      console.error("Invalid response:", data);
+      throw new Error("No prediction ID returned from the API");
+    }
+
+    return data as ReplicateResponse;
+  } catch (error) {
+    console.error("Caught error in startImageGeneration:", error);
+    throw error;
   }
-
-  console.log("Response from replicate-image function:", data);
-
-  if (!data || !data.id) {
-    throw new Error("No prediction ID returned from the API");
-  }
-
-  return data as ReplicateResponse;
 };
 
 export const checkGenerationStatus = async (predictionId: string): Promise<ReplicateResponse> => {
   console.log("Checking status for prediction:", predictionId);
   
-  const { data, error } = await supabase.functions.invoke("replicate-image", {
-    body: { predictionId: predictionId }
-  });
-  
-  if (error) {
-    console.error("Error checking status:", error);
-    throw new Error(`Error checking status: ${error.message}`);
+  try {
+    const { data, error } = await supabase.functions.invoke("replicate-image", {
+      body: { predictionId: predictionId }
+    });
+    
+    if (error) {
+      console.error("Error checking status:", error);
+      throw new Error(`Error checking status: ${error.message}`);
+    }
+    
+    if (!data) {
+      console.error("Empty response from status check");
+      throw new Error("No data returned from status check");
+    }
+    
+    console.log("Status check response:", data);
+    return data as ReplicateResponse;
+  } catch (error) {
+    console.error("Caught error in checkGenerationStatus:", error);
+    throw error;
   }
-  
-  if (!data) {
-    throw new Error("No data returned from status check");
-  }
-  
-  return data as ReplicateResponse;
 };
 
 export const cancelReplicatePrediction = async (predictionId: string): Promise<void> => {
   console.log("Attempting to cancel prediction:", predictionId);
   
-  const { error } = await supabase.functions.invoke("replicate-image", {
-    body: { 
-      predictionId,
-      cancel: true 
+  try {
+    const { error } = await supabase.functions.invoke("replicate-image", {
+      body: { 
+        predictionId,
+        cancel: true 
+      }
+    });
+    
+    if (error) {
+      console.error("Error canceling prediction:", error);
+      throw new Error(`Error canceling generation: ${error.message}`);
     }
-  });
-  
-  if (error) {
-    console.error("Error canceling prediction:", error);
-    throw new Error(`Error canceling generation: ${error.message}`);
+  } catch (error) {
+    console.error("Caught error in cancelReplicatePrediction:", error);
+    throw error;
   }
 };

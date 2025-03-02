@@ -14,6 +14,7 @@ export const useReplicateGeneration = () => {
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string>("");
   const [predictionId, setPredictionId] = useState<string>("");
   const [generationStatus, setGenerationStatus] = useState<string>("");
+  const [generationError, setGenerationError] = useState<string>("");
   const { toast } = useToast();
   const { handleApiError, handleGenerationError } = useErrorHandler();
 
@@ -45,15 +46,16 @@ export const useReplicateGeneration = () => {
       
       // If it failed, show an error
       if (prediction.status === "failed" || prediction.error) {
-        handleGenerationError(
-          prediction.error || "Unknown generation error", 
-          "Image"
-        );
+        const errorMsg = prediction.error || "Unknown generation error";
+        setGenerationError(errorMsg);
+        handleGenerationError(errorMsg, "Image");
       }
       
       // Regardless of outcome, we're no longer generating
       setIsGenerating(false);
     } catch (error) {
+      console.error("Error in pollGenerationStatus:", error);
+      setGenerationError(error instanceof Error ? error.message : String(error));
       handleApiError(error, "checking generation status");
       setIsGenerating(false);
       setGenerationStatus("failed");
@@ -64,10 +66,14 @@ export const useReplicateGeneration = () => {
     setIsGenerating(true);
     setGenerationStatus("starting");
     setGeneratedImageUrl("");
+    setGenerationError("");
     
     try {
+      console.log("Starting image generation with options:", options);
       const response = await startImageGeneration(options);
 
+      console.log("Received generation response:", response);
+      
       // Store the prediction ID for status checks
       setPredictionId(response.id);
       setGenerationStatus("processing");
@@ -76,6 +82,8 @@ export const useReplicateGeneration = () => {
       await pollGenerationStatus(response.id);
       return true;
     } catch (error) {
+      console.error("Error in generateImage:", error);
+      setGenerationError(error instanceof Error ? error.message : String(error));
       handleGenerationError(error, "Image");
       setIsGenerating(false);
       setGenerationStatus("failed");
@@ -97,6 +105,7 @@ export const useReplicateGeneration = () => {
       });
     } catch (error) {
       console.error("Error canceling generation:", error);
+      setGenerationError(error instanceof Error ? error.message : String(error));
       // Even if the cancellation fails, update the UI
       setIsGenerating(false);
       setGenerationStatus("canceled");
@@ -107,6 +116,7 @@ export const useReplicateGeneration = () => {
     isGenerating,
     generatedImageUrl,
     generationStatus,
+    generationError,
     generateImage,
     cancelGeneration
   };

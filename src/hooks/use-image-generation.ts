@@ -10,6 +10,7 @@ export const useImageGeneration = () => {
   const [prompt, setPrompt] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string>("");
+  const [generationError, setGenerationError] = useState<string>("");
   const { toast } = useToast();
   const { handleGenerationError } = useErrorHandler();
   
@@ -18,6 +19,7 @@ export const useImageGeneration = () => {
     setSelectedCharacter,
     unlockedCharacters,
     loraStrength,
+    setLoraStrength,
     updateCharacterLastUsed,
     fetchUnlockedCharacters
   } = useCharacterManagement();
@@ -27,6 +29,7 @@ export const useImageGeneration = () => {
     isGenerating: replicateIsGenerating,
     generatedImageUrl: replicateGeneratedImageUrl,
     generationStatus,
+    generationError: replicateGenerationError,
     cancelGeneration,
   } = useReplicateGeneration();
 
@@ -43,7 +46,17 @@ export const useImageGeneration = () => {
     }
   }, [selectedCharacter, unlockedCharacters, setSelectedCharacter]);
 
+  // Track error state from Replicate
+  useEffect(() => {
+    if (replicateGenerationError) {
+      setGenerationError(replicateGenerationError);
+    } else {
+      setGenerationError("");
+    }
+  }, [replicateGenerationError]);
+
   const handleImageGenerate = async () => {
+    setGenerationError("");
     try {
       // Check if we have any unlocked characters first
       if (unlockedCharacters.length === 0) {
@@ -88,6 +101,8 @@ export const useImageGeneration = () => {
         updateCharacterLastUsed(character.id);
       }
     } catch (error) {
+      console.error("Error in handleImageGenerate:", error);
+      setGenerationError(error instanceof Error ? error.message : String(error));
       handleGenerationError(error, "Image");
     }
   };
@@ -113,11 +128,14 @@ export const useImageGeneration = () => {
     setPrompt,
     isGenerating,
     generatedImageUrl,
+    generationError,
     handleImageGenerate,
     setGeneratedImageUrl,
     generationStatus,
     cancelGeneration,
     selectedCharacter,
-    setSelectedCharacter
+    setSelectedCharacter,
+    loraStrength,
+    setLoraStrength
   };
 };

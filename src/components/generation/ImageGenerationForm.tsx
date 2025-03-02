@@ -1,11 +1,12 @@
 
 import { CustomButton } from "@/components/ui/custom-button";
-import { Download, Share2, Image, X } from "lucide-react";
+import { Download, Share2, Image, X, AlertTriangle } from "lucide-react";
 import { Character } from "@/types/character";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useReplicateGeneration } from "@/hooks/use-replicate-generation";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ImageGenerationFormProps {
   selectedCharacter: string;
@@ -37,12 +38,24 @@ export const ImageGenerationForm = ({
   cancelGeneration
 }: ImageGenerationFormProps) => {
   const [sliderValue, setSliderValue] = useState([loraStrength]);
+  const [error, setError] = useState<string | null>(null);
+  
   const { 
     isGenerating: localIsGenerating, 
-    generatedImageUrl: localGeneratedImageUrl, 
-    generateImage, 
+    generatedImageUrl: localGeneratedImageUrl,
+    generateImage,
+    generationError,
   } = useReplicateGeneration();
   
+  // Track errors from the Replicate generation hook
+  useEffect(() => {
+    if (generationError) {
+      setError(generationError);
+    } else {
+      setError(null);
+    }
+  }, [generationError]);
+
   const handleSliderChange = (value: number[]) => {
     setSliderValue(value);
     if (setLoraStrength) {
@@ -53,6 +66,8 @@ export const ImageGenerationForm = ({
   const selectedCharacterData = unlockedCharacters.find(char => char.id === selectedCharacter);
 
   const handleReplicateGenerate = () => {
+    setError(null);
+    
     if (parentIsGenerating && cancelGeneration) {
       cancelGeneration();
       return;
@@ -127,6 +142,15 @@ export const ImageGenerationForm = ({
             Adjust how strongly the character style appears in the generated image
           </p>
         </div>
+      )}
+
+      {error && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription className="ml-2">
+            Error: {error}
+          </AlertDescription>
+        </Alert>
       )}
 
       {generationStatus === "processing" && (
