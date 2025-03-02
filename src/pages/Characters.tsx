@@ -17,7 +17,8 @@ const Characters = () => {
     setSearchQuery, 
     selectedGenre, 
     setSelectedGenre, 
-    filteredCharacters 
+    filteredCharacters,
+    genres 
   } = useCharacterFilter(characters);
 
   useEffect(() => {
@@ -60,6 +61,7 @@ const Characters = () => {
         setSearchQuery={setSearchQuery}
         selectedGenre={selectedGenre}
         setSelectedGenre={setSelectedGenre}
+        genres={genres}
       />
 
       <CharacterGrid
