@@ -7,15 +7,19 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
 import { Character } from "@/types/character";
 import { Badge } from "@/components/ui/badge";
+import { LoraUploadDialog } from "@/components/characters/lora-upload-dialog";
+import { Sparkles, Upload } from "lucide-react";
 
 interface CharacterDialogProps {
   character: Character | null;
   onClose: () => void;
   onUnlock?: (character: Character) => void;
+  onLoraUploadComplete?: () => void;
 }
 
-export const CharacterDialog = ({ character, onClose, onUnlock }: CharacterDialogProps) => {
+export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComplete }: CharacterDialogProps) => {
   const [showUnlockConfirmation, setShowUnlockConfirmation] = useState(false);
+  const [showLoraUploadDialog, setShowLoraUploadDialog] = useState(false);
   const navigate = useNavigate();
 
   if (!character) return null;
@@ -34,6 +38,12 @@ export const CharacterDialog = ({ character, onClose, onUnlock }: CharacterDialo
   const handleGenerateClick = () => {
     onClose();
     navigate(`/generate?character=${character.id}`);
+  };
+
+  const handleLoraUploadComplete = () => {
+    if (onLoraUploadComplete) {
+      onLoraUploadComplete();
+    }
   };
 
   return (
@@ -90,13 +100,25 @@ export const CharacterDialog = ({ character, onClose, onUnlock }: CharacterDialo
                     Unlock Character
                   </CustomButton>
                 ) : (
-                  <CustomButton
-                    className="w-full"
-                    variant="default"
-                    onClick={handleGenerateClick}
-                  >
-                    Generate Video
-                  </CustomButton>
+                  <div className="flex flex-col space-y-2">
+                    <CustomButton
+                      className="w-full"
+                      variant="default"
+                      onClick={handleGenerateClick}
+                    >
+                      Generate Video
+                    </CustomButton>
+                    
+                    <CustomButton
+                      className="w-full"
+                      variant="outline"
+                      onClick={() => setShowLoraUploadDialog(true)}
+                      disabled={character.isLocked}
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      {character.loraFileId ? "Update LoRA File" : "Upload LoRA File"}
+                    </CustomButton>
+                  </div>
                 )}
 
                 <div className="space-y-2">
@@ -119,6 +141,15 @@ export const CharacterDialog = ({ character, onClose, onUnlock }: CharacterDialo
         onConfirm={handleConfirmUnlock}
         characterName={character.name}
       />
+
+      {!character.isLocked && (
+        <LoraUploadDialog
+          isOpen={showLoraUploadDialog}
+          onClose={() => setShowLoraUploadDialog(false)}
+          character={character}
+          onUploadComplete={handleLoraUploadComplete}
+        />
+      )}
     </>
   );
 };

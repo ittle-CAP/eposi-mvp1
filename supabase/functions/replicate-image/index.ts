@@ -1,157 +1,243 @@
-
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import Replicate from "https://esm.sh/replicate@0.25.2"
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'apikey, Authorization, X-Client-Info, Content-Type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, DELETE',
 };
+
+// Replicate API calls
+const REPLICATE_API_TOKEN = Deno.env.get('REPLICATE_IMAGEGEN_KEY');
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, {
+      headers: {
+        ...corsHeaders,
+      },
+    });
   }
 
   try {
-    const REPLICATE_API_KEY = Deno.env.get('REPLICATE_IMAGEGEN_KEY')
-    
-    // Enhanced error handling for API key
-    if (!REPLICATE_API_KEY) {
-      console.error("ERROR: REPLICATE_IMAGEGEN_KEY environment variable is not set");
-      return new Response(JSON.stringify({ 
-        error: "REPLICATE_IMAGEGEN_KEY is not configured",
-        details: "The API key for Replicate is missing in the environment variables."
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      })
-    }
+    const reqJson = await req.json();
 
-    console.log("Using REPLICATE_IMAGEGEN_KEY: " + REPLICATE_API_KEY.substring(0, 4) + "..." + REPLICATE_API_KEY.substring(REPLICATE_API_KEY.length - 4));
-    
-    const replicate = new Replicate({
-      auth: REPLICATE_API_KEY,
-    });
-
-    const body = await req.json()
-    console.log("Request body:", JSON.stringify(body))
-
-    // If it's a cancel request
-    if (body.predictionId && body.cancel) {
-      console.log("Canceling prediction:", body.predictionId)
-      try {
-        await replicate.predictions.cancel(body.predictionId)
-        return new Response(JSON.stringify({ status: "canceled" }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-      } catch (cancelError) {
-        console.error("Error canceling prediction:", cancelError)
-        return new Response(JSON.stringify({ 
-          error: "Failed to cancel prediction",
-          details: cancelError.message 
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500,
-        })
+    // Check if this is a request to get the status of a prediction
+    if (reqJson.predictionId) {
+      // Check if we're cancelling the prediction
+      if (reqJson.cancel) {
+        return await cancelPrediction(reqJson.predictionId);
       }
+      // Otherwise check the status
+      return await checkPredictionStatus(reqJson.predictionId);
     }
 
-    // If it's a status check request
-    if (body.predictionId) {
-      console.log("Checking status for prediction:", body.predictionId)
-      try {
-        const prediction = await replicate.predictions.get(body.predictionId)
-        console.log("Status check response:", prediction)
-        return new Response(JSON.stringify(prediction), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-      } catch (statusError) {
-        console.error("Error checking prediction status:", statusError)
-        return new Response(JSON.stringify({ 
-          error: "Failed to check prediction status",
-          details: statusError.message 
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500,
-        })
-      }
-    }
-
-    // If it's a generation request
-    if (!body.prompt) {
-      return new Response(
-        JSON.stringify({ 
-          error: "Missing required field: prompt is required" 
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400,
-        }
-      )
-    }
-
-    // Setup the base input
-    const input: Record<string, any> = {
-      prompt: body.prompt,
-      negative_prompt: body.negative_prompt || "",
-      width: body.width || 512,
-      height: body.height || 512,
-      num_outputs: body.numOutputs || 1,
-      scheduler: body.scheduler || "K_EULER_ANCESTRAL",
-      num_inference_steps: body.steps || 30,
-      guidance_scale: body.guidanceScale || 7.5,
-      seed: body.seed || Math.floor(Math.random() * 2147483647),
-    };
-    
-    let prediction;
-    
-    // We're using the flux-dev-lora model for all requests
-    const modelVersion = "black-forest-labs/flux-dev-lora";
-    
-    // If there's a LoRA URL, add it to the input
-    if (body.loraUrl && body.loraUrl.trim() !== "") {
-      console.log(`Using model ${modelVersion} with LoRA: ${body.loraUrl}, strength: ${body.loraStrength || 0.7}`);
-      input.lora_url = body.loraUrl;
-      input.lora_scale = body.loraStrength || 0.7;
-    } else {
-      console.log(`Using model ${modelVersion} with NO LoRAs`);
-      // Explicitly set empty LoRA parameters to ensure clean generation
-      input.lora_url = "";
-      input.lora_scale = 0;
-    }
-    
-    try {
-      // Create prediction with the flux-dev-lora model
-      prediction = await replicate.predictions.create({
-        version: modelVersion,
-        input: input
-      });
-      
-      console.log("Prediction created:", prediction);
-    } catch (error) {
-      console.error(`Error creating prediction with ${modelVersion}:`, error);
-      return new Response(JSON.stringify({ 
-        error: `Failed to create prediction with ${modelVersion}`,
-        details: error.message 
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      });
-    }
-
-    return new Response(JSON.stringify(prediction), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
-    });
+    // If not fetching status, this is a new prediction request
+    return await createPrediction(reqJson);
   } catch (error) {
-    console.error("Error in replicate function:", error);
-    return new Response(JSON.stringify({ 
-      error: error.message,
-      details: "This might be related to API key issues, model versions, or configuration problems with Replicate."
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    console.error('Error processing request:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
       status: 500,
     });
   }
 });
+
+async function createPrediction(options: any) {
+  console.log('Starting prediction with options:', JSON.stringify(options));
+
+  // Set defaults and validate inputs
+  const prompt = options.prompt;
+  if (!prompt) {
+    return new Response(JSON.stringify({ error: 'A prompt is required' }), {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
+      status: 400,
+    });
+  }
+
+  // Base model to use
+  const model = "black-forest-labs/flux-dev-lora";
+  
+  // Build API request body
+  const replicateBody: Record<string, any> = {
+    version: model,
+    input: {
+      prompt: prompt,
+      width: options.width || 512,
+      height: options.height || 512,
+      num_outputs: options.numOutputs || 1,
+      scheduler: options.scheduler || "K_EULER_ANCESTRAL",
+      guidance_scale: options.guidanceScale || 7.5,
+      num_inference_steps: options.steps || 30,
+      negative_prompt: options.negativePrompt || "ugly, blurry, low quality, distorted, disfigured",
+    },
+  };
+
+  // Add seed if provided
+  if (options.seed !== undefined) {
+    replicateBody.input.seed = options.seed;
+  }
+
+  // Add LoRA settings if provided
+  if (options.loraUrl && options.loraUrl.trim() !== "") {
+    console.log(`Using LoRA URL: ${options.loraUrl}`);
+    replicateBody.input.lora_url = options.loraUrl;
+    replicateBody.input.lora_scale = options.loraStrength || 0.7;
+  }
+
+  console.log('Final Replicate API request:', JSON.stringify(replicateBody));
+
+  // Call the Replicate API
+  try {
+    const response = await fetch('https://api.replicate.com/v1/predictions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Token ${REPLICATE_API_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(replicateBody),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Replicate API error:', error);
+      return new Response(JSON.stringify({ error: `Replicate API error: ${error.detail || JSON.stringify(error)}` }), {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+        status: response.status,
+      });
+    }
+
+    const prediction = await response.json();
+    console.log('Prediction created:', prediction);
+    
+    return new Response(JSON.stringify({
+      id: prediction.id,
+      status: prediction.status,
+    }), {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
+      status: 200,
+    });
+  } catch (error) {
+    console.error('Error calling Replicate API:', error);
+    return new Response(JSON.stringify({ error: `Error calling Replicate API: ${error.message}` }), {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
+      status: 500,
+    });
+  }
+}
+
+async function checkPredictionStatus(predictionId: string) {
+  try {
+    const response = await fetch(`https://api.replicate.com/v1/predictions/${predictionId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token ${REPLICATE_API_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return new Response(JSON.stringify({ error: `Error checking prediction status: ${error.detail || JSON.stringify(error)}` }), {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+        status: response.status,
+      });
+    }
+
+    const prediction = await response.json();
+    console.log(`Status for prediction ${predictionId}:`, prediction.status);
+    
+    // Map Replicate status to our custom format
+    let status = prediction.status;
+    if (status === "succeeded") {
+      status = "succeeded";
+    } else if (status === "failed") {
+      status = "failed";
+    } else {
+      status = "processing";
+    }
+
+    return new Response(JSON.stringify({
+      id: prediction.id,
+      status: status,
+      output: prediction.output,
+      error: prediction.error,
+    }), {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
+      status: 200,
+    });
+  } catch (error) {
+    console.error('Error checking prediction status:', error);
+    return new Response(JSON.stringify({ error: `Error checking prediction status: ${error.message}` }), {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
+      status: 500,
+    });
+  }
+}
+
+async function cancelPrediction(predictionId: string) {
+  try {
+    const response = await fetch(`https://api.replicate.com/v1/predictions/${predictionId}/cancel`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Token ${REPLICATE_API_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return new Response(JSON.stringify({ error: `Error cancelling prediction: ${error.detail || JSON.stringify(error)}` }), {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+        status: response.status,
+      });
+    }
+
+    return new Response(JSON.stringify({
+      id: predictionId,
+      status: "canceled",
+    }), {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
+      status: 200,
+    });
+  } catch (error) {
+    console.error('Error cancelling prediction:', error);
+    return new Response(JSON.stringify({ error: `Error cancelling prediction: ${error.message}` }), {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
+      status: 500,
+    });
+  }
+}

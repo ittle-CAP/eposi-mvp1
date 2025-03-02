@@ -14,7 +14,7 @@ export const startImageGeneration = async (options: ReplicateGenerationOptions):
     steps: options.steps || 30,
     guidanceScale: options.guidanceScale || 7.5,
     scheduler: options.scheduler || "K_EULER_ANCESTRAL", // Better for detailed images
-    modelVersion: "black-forest-labs/flux-dev-lora", // Changed to use the new model
+    modelVersion: "black-forest-labs/flux-dev-lora", // Using the LoRA-enabled model
     negative_prompt: options.negativePrompt || "ugly, blurry, low quality, distorted, disfigured"
   };
   

@@ -1,71 +1,76 @@
 
-import { useState } from "react";
-import { CharacterDialog } from "@/components/character-dialog";
-import { SearchFilter } from "@/components/characters/search-filter";
-import { CharacterGrid } from "@/components/characters/character-grid";
-import { Header } from "@/components/navigation/header";
-import { useSubscription } from "@/hooks/use-subscription";
+import { useState, useEffect } from "react";
 import { useCharacters } from "@/hooks/use-characters";
-import { useCharacterFilter } from "@/hooks/use-character-filter";
+import { CharacterGrid } from "@/components/characters/character-grid";
+import { CharacterDialog } from "@/components/character-dialog";
 import { Character } from "@/types/character";
-import { useToast } from "@/hooks/use-toast";
+import { useSubscription } from "@/hooks/use-subscription";
+import { SearchFilter } from "@/components/characters/search-filter";
+import { useCharacterFilter } from "@/hooks/use-character-filter";
 
 const Characters = () => {
-  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
   const { characters, unlockedCharacterIds, fetchUnlockedCharacters } = useCharacters();
   const { unlockCharacter } = useSubscription();
-  const { toast } = useToast();
-  
-  const {
-    searchQuery,
-    setSearchQuery,
-    selectedGenre,
-    setSelectedGenre,
-    filteredCharacters,
-    genres
-  } = useCharacterFilter(characters);
+  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
+  const { filterCharacters, searchTerm, setSearchTerm, selectedGenre, setSelectedGenre } = useCharacterFilter();
+
+  useEffect(() => {
+    document.title = "Characters | AI Video Generator";
+  }, []);
+
+  const handleSelectCharacter = (character: Character) => {
+    setSelectedCharacter(character);
+  };
 
   const handleUnlockCharacter = async (character: Character) => {
-    if (!character.isLocked) return;
-    
-    const success = await unlockCharacter(character.id, character.name);
+    const success = await unlockCharacter(character.id, character.name, character.imageUrl);
     if (success) {
-      await fetchUnlockedCharacters(); // Refresh the unlocked characters list
-      toast({
-        title: "Character Unlocked",
-        description: `${character.name} has been successfully unlocked!`,
-      });
-      setSelectedCharacter(null); // Close the dialog after successful unlock
+      // Refresh the character data after unlock
+      fetchUnlockedCharacters();
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-8">
-      <Header />
+  const handleLoraUploadComplete = () => {
+    // Refresh the character data after LoRA upload
+    fetchUnlockedCharacters();
+  };
 
-      <h1 className="mb-8 pt-20 text-center text-4xl font-bold text-gray-900">Characters</h1>
+  const handleCloseDialog = () => {
+    setSelectedCharacter(null);
+  };
+
+  const filteredCharacters = filterCharacters(characters);
+
+  return (
+    <div className="container mx-auto py-8">
+      <div className="mb-8">
+        <h1 className="mb-4 text-3xl font-bold">Characters</h1>
+        <p className="text-gray-600">
+          Choose from our collection of AI characters to create unique videos and images.
+          Unlock characters using your subscription unlocks.
+        </p>
+      </div>
 
       <SearchFilter
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
         selectedGenre={selectedGenre}
         setSelectedGenre={setSelectedGenre}
-        genres={genres}
+        characters={characters}
       />
 
       <CharacterGrid
         characters={filteredCharacters}
         unlockedCharacterIds={unlockedCharacterIds}
-        onSelectCharacter={setSelectedCharacter}
+        onSelectCharacter={handleSelectCharacter}
+        onUnlock={handleUnlockCharacter}
       />
 
       <CharacterDialog
-        character={selectedCharacter ? {
-          ...selectedCharacter,
-          isLocked: !unlockedCharacterIds.includes(selectedCharacter.id)
-        } : null}
-        onClose={() => setSelectedCharacter(null)}
+        character={selectedCharacter}
+        onClose={handleCloseDialog}
         onUnlock={handleUnlockCharacter}
+        onLoraUploadComplete={handleLoraUploadComplete}
       />
     </div>
   );
