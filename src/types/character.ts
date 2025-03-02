@@ -7,4 +7,7 @@ export interface Character {
   isLocked: boolean;
   description: string;
   unlocks: number;
+  loraFileId?: string;
+  loraFileUrl?: string;
+  loraStrength?: number;
 }
