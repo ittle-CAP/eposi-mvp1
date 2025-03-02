@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Character } from "@/types/character";
@@ -124,10 +123,24 @@ export const useVideoGeneration = () => {
 
   const handleVideoGenerate = async () => {
     setIsGenerating(true);
-    setTimeout(() => {
-      setGeneratedVideoUrl("https://example.com/sample-video.mp4");
+    try {
+      // In a real implementation, we would send the selected image and prompt to the backend
+      console.log(`Generating video with image: ${selectedImage} and prompt: ${prompt}`);
+      
+      // For demo purposes, show a placeholder after a delay
+      setTimeout(() => {
+        setGeneratedVideoUrl("https://example.com/sample-video.mp4");
+        setIsGenerating(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Error generating video:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate video",
+        variant: "destructive",
+      });
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   const handleImageGenerate = async () => {
