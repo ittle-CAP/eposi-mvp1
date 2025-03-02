@@ -5,24 +5,26 @@ import { ReplicateGenerationOptions, ReplicateResponse } from "@/types/replicate
 export const startImageGeneration = async (options: ReplicateGenerationOptions): Promise<ReplicateResponse> => {
   console.log("Starting image generation with Replicate:", options);
   
+  // Use sensible defaults for any missing options
   const body: Record<string, any> = {
     prompt: options.prompt,
-    width: options.width,
-    height: options.height,
-    numOutputs: options.numOutputs,
-    steps: options.steps,
-    guidanceScale: options.guidanceScale,
-    modelVersion: options.modelVersion
+    width: options.width || 512,
+    height: options.height || 512,
+    numOutputs: options.numOutputs || 1,
+    steps: options.steps || 30,
+    guidanceScale: options.guidanceScale || 7.5,
+    scheduler: options.scheduler || "K_EULER_ANCESTRAL", // Better for detailed images
+    modelVersion: options.modelVersion,
+    negative_prompt: options.negativePrompt || "ugly, blurry, low quality, distorted, disfigured"
   };
   
   // Only include LoRA options if a LoRA URL is provided
   if (options.loraUrl) {
     body.loraUrl = options.loraUrl;
     body.loraStrength = options.loraStrength || 0.7;
-  }
-  
-  if (options.negativePrompt) {
-    body.negativePrompt = options.negativePrompt;
+    console.log(`Using LoRA with URL: ${options.loraUrl} and strength: ${options.loraStrength || 0.7}`);
+  } else {
+    console.log("No LoRA specified, using base model");
   }
   
   try {

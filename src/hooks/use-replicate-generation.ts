@@ -69,6 +69,16 @@ export const useReplicateGeneration = () => {
     setGenerationError("");
     
     try {
+      // Ensure we have a good negative prompt by default
+      if (!options.negativePrompt) {
+        options.negativePrompt = "ugly, blurry, low quality, distorted, disfigured";
+      }
+      
+      // Ensure we have a reasonable number of steps for good quality
+      if (!options.steps || options.steps < 20) {
+        options.steps = 30;
+      }
+      
       console.log("Starting image generation with options:", options);
       const response = await startImageGeneration(options);
 

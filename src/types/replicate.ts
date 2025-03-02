@@ -10,6 +10,7 @@ export interface ReplicateGenerationOptions {
   steps?: number;
   guidanceScale?: number;
   modelVersion?: string;
+  scheduler?: "DDIM" | "DPMSolverMultistep" | "K_EULER" | "K_EULER_ANCESTRAL" | "PNDM";
 }
 
 export interface ReplicateResponse {
