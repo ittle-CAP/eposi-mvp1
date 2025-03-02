@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      character_loras: {
+        Row: {
+          character_id: string
+          created_at: string | null
+          file_format: string
+          file_name: string
+          file_url: string
+          id: string
+          strength: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          character_id: string
+          created_at?: string | null
+          file_format?: string
+          file_name: string
+          file_url: string
+          id?: string
+          strength?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          character_id?: string
+          created_at?: string | null
+          file_format?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          strength?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -91,6 +124,8 @@ export type Database = {
           id: string
           image_url: string | null
           last_used_at: string | null
+          lora_file_id: string | null
+          lora_strength: number | null
           user_id: string
         }
         Insert: {
@@ -100,6 +135,8 @@ export type Database = {
           id?: string
           image_url?: string | null
           last_used_at?: string | null
+          lora_file_id?: string | null
+          lora_strength?: number | null
           user_id: string
         }
         Update: {
@@ -109,9 +146,18 @@ export type Database = {
           id?: string
           image_url?: string | null
           last_used_at?: string | null
+          lora_file_id?: string | null
+          lora_strength?: number | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "unlocked_characters_lora_file_id_fkey"
+            columns: ["lora_file_id"]
+            isOneToOne: false
+            referencedRelation: "character_loras"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "unlocked_characters_user_id_fkey"
             columns: ["user_id"]

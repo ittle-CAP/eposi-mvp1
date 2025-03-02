@@ -5,11 +5,12 @@ import { Character } from "@/types/character";
 
 export const useCharacters = () => {
   const [unlockedCharacterIds, setUnlockedCharacterIds] = useState<string[]>([]);
+  const [characterLoras, setCharacterLoras] = useState<Record<string, any>>({});
 
   const fetchUnlockedCharacters = async () => {
     const { data, error } = await supabase
       .from('unlocked_characters')
-      .select('character_id');
+      .select('character_id, lora_file_id, lora_strength');
     
     if (error) {
       console.error('Error fetching unlocked characters:', error);
@@ -17,11 +18,58 @@ export const useCharacters = () => {
     }
 
     setUnlockedCharacterIds(data.map(char => char.character_id));
+    
+    // Create a map of character IDs to LoRA file IDs and strengths
+    const loraMap: Record<string, any> = {};
+    data.forEach(char => {
+      if (char.lora_file_id) {
+        loraMap[char.character_id] = {
+          loraFileId: char.lora_file_id,
+          loraStrength: char.lora_strength || 0.7
+        };
+      }
+    });
+    setCharacterLoras(loraMap);
+  };
+
+  const fetchLoraDetails = async () => {
+    const loraFileIds = Object.values(characterLoras).map(lora => lora.loraFileId).filter(Boolean);
+    
+    if (loraFileIds.length === 0) return;
+    
+    const { data, error } = await supabase
+      .from('character_loras')
+      .select('*')
+      .in('id', loraFileIds);
+      
+    if (error) {
+      console.error('Error fetching LoRA details:', error);
+      return;
+    }
+    
+    // Update the characterLoras map with file URLs
+    const updatedLoras = { ...characterLoras };
+    data.forEach(lora => {
+      // Find all characters using this LoRA file
+      Object.keys(characterLoras).forEach(charId => {
+        if (characterLoras[charId].loraFileId === lora.id) {
+          updatedLoras[charId].loraFileUrl = lora.file_url;
+        }
+      });
+    });
+    
+    setCharacterLoras(updatedLoras);
   };
 
   useEffect(() => {
     fetchUnlockedCharacters();
   }, []);
+  
+  useEffect(() => {
+    if (Object.keys(characterLoras).length > 0) {
+      fetchLoraDetails();
+    }
+  }, [characterLoras]);
 
   const characters: Character[] = [
     {
@@ -32,6 +80,7 @@ export const useCharacters = () => {
       isLocked: !unlockedCharacterIds.includes("1"),
       description: "A mystical character with the power to control dreams and nightmares.",
       unlocks: 1523,
+      ...(characterLoras["1"] || {})
     },
     {
       id: "2",
@@ -41,6 +90,7 @@ export const useCharacters = () => {
       isLocked: !unlockedCharacterIds.includes("2"),
       description: "A digital warrior fighting against the machine world.",
       unlocks: 2891,
+      ...(characterLoras["2"] || {})
     },
     {
       id: "3",
@@ -50,6 +100,7 @@ export const useCharacters = () => {
       isLocked: !unlockedCharacterIds.includes("3"),
       description: "A magical cat with nine lives and the ability to speak to humans.",
       unlocks: 943,
+      ...(characterLoras["3"] || {})
     },
     {
       id: "4",
@@ -59,6 +110,7 @@ export const useCharacters = () => {
       isLocked: !unlockedCharacterIds.includes("4"),
       description: "A quirky robot character from the hit game 'Digital Dreams'.",
       unlocks: 3156,
+      ...(characterLoras["4"] || {})
     },
     {
       id: "5",
@@ -68,6 +120,7 @@ export const useCharacters = () => {
       isLocked: !unlockedCharacterIds.includes("5"),
       description: "A brilliant detective with an uncanny ability to solve impossible cases.",
       unlocks: 756,
+      ...(characterLoras["5"] || {})
     },
     {
       id: "6",
@@ -77,6 +130,7 @@ export const useCharacters = () => {
       isLocked: !unlockedCharacterIds.includes("6"),
       description: "A wildlife conservationist who can communicate with animals.",
       unlocks: 1892,
+      ...(characterLoras["6"] || {})
     },
     {
       id: "7",
@@ -86,6 +140,7 @@ export const useCharacters = () => {
       isLocked: !unlockedCharacterIds.includes("7"),
       description: "The legendary ruler of the mountain realms, wielding ancient magic.",
       unlocks: 2341,
+      ...(characterLoras["7"] || {})
     }
   ];
 

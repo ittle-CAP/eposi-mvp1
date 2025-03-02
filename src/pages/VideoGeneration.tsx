@@ -15,6 +15,7 @@ const VideoGeneration = () => {
   const [selectedCharacter, setSelectedCharacter] = useState<string>("");
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [prompt, setPrompt] = useState<string>("");
+  const [loraStrength, setLoraStrength] = useState<number>(0.7);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string>("");
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string>("");
@@ -30,7 +31,7 @@ const VideoGeneration = () => {
         console.log('Fetching unlocked characters...');
         const { data: unlockedData, error: unlockedError } = await supabase
           .from('unlocked_characters')
-          .select('*')
+          .select('*, character_loras(*)')
           .eq('user_id', user.user.id);
 
         if (unlockedError) {
@@ -92,6 +93,17 @@ const VideoGeneration = () => {
 
         const characters: Character[] = unlockedData.map(char => {
           const presetData = characterData[char.character_id as keyof typeof characterData];
+          
+          // Extract LoRA file info if available
+          let loraFileId = null;
+          let loraFileUrl = null;
+          let loraStrength = char.lora_strength || 0.7;
+          
+          if (char.lora_file_id && char.character_loras) {
+            loraFileId = char.lora_file_id;
+            loraFileUrl = char.character_loras.file_url;
+          }
+          
           return {
             id: char.character_id,
             name: char.character_name,
@@ -99,11 +111,14 @@ const VideoGeneration = () => {
             imageUrl: presetData?.imageUrl || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e',
             isLocked: false,
             description: presetData?.description || `An AI character named ${char.character_name}`,
-            unlocks: 0
+            unlocks: 0,
+            loraFileId,
+            loraFileUrl,
+            loraStrength
           };
         });
 
-        console.log('Transformed characters with images:', characters);
+        console.log('Transformed characters with LoRA info:', characters);
         setUnlockedCharacters(characters);
       } catch (error) {
         console.error('Error in fetchUnlockedCharacters:', error);
@@ -135,10 +150,57 @@ const VideoGeneration = () => {
 
   const handleImageGenerate = async () => {
     setIsGenerating(true);
-    setTimeout(() => {
-      setGeneratedImageUrl("https://picsum.photos/512/512");
+    try {
+      const character = unlockedCharacters.find(char => char.id === selectedCharacter);
+      
+      if (!character) {
+        throw new Error("Character not found");
+      }
+      
+      // In a real implementation, we would call our backend API with the LoRA file information
+      console.log(`Generating image with LoRA: ${character.loraFileId}, strength: ${loraStrength}`);
+      
+      // For now, just show a placeholder
+      setTimeout(() => {
+        setGeneratedImageUrl("https://picsum.photos/512/512");
+        setIsGenerating(false);
+        
+        // Update the last used timestamp for the character
+        if (character) {
+          updateCharacterLastUsed(character.id);
+        }
+      }, 2000);
+    } catch (error) {
+      console.error("Error generating image:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate image",
+        variant: "destructive",
+      });
       setIsGenerating(false);
-    }, 2000);
+    }
+  };
+  
+  const updateCharacterLastUsed = async (characterId: string) => {
+    try {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) return;
+      
+      const { error } = await supabase
+        .from('unlocked_characters')
+        .update({ 
+          last_used_at: new Date().toISOString(),
+          lora_strength: loraStrength
+        })
+        .eq('user_id', user.user.id)
+        .eq('character_id', characterId);
+        
+      if (error) {
+        console.error("Error updating character last used:", error);
+      }
+    } catch (error) {
+      console.error("Error in updateCharacterLastUsed:", error);
+    }
   };
 
   return (
@@ -169,6 +231,8 @@ const VideoGeneration = () => {
               handleGenerate={handleImageGenerate}
               generatedImageUrl={generatedImageUrl}
               unlockedCharacters={unlockedCharacters}
+              loraStrength={loraStrength}
+              setLoraStrength={setLoraStrength}
             />
           </TabsContent>
 

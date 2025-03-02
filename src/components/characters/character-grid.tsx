@@ -17,17 +17,22 @@ export const CharacterGrid = ({
 }: CharacterGridProps) => {
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-      {characters.map((character) => (
-        <CharacterCard
-          key={character.id}
-          character={{
-            ...character,
-            isLocked: !unlockedCharacterIds.includes(character.id)
-          }}
-          onClick={() => onSelectCharacter(character)}
-          onUnlock={onUnlock}
-        />
-      ))}
+      {characters.map((character) => {
+        // Check if character has LoRA info
+        const isUnlocked = unlockedCharacterIds.includes(character.id);
+        
+        return (
+          <CharacterCard
+            key={character.id}
+            character={{
+              ...character,
+              isLocked: !isUnlocked
+            }}
+            onClick={() => onSelectCharacter(character)}
+            onUnlock={onUnlock}
+          />
+        );
+      })}
     </div>
   );
 };

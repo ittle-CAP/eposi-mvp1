@@ -5,16 +5,7 @@ import { CustomButton } from "@/components/ui/custom-button";
 import { useNavigate } from "react-router-dom";
 import { UnlockConfirmationDialog } from "@/components/characters/unlock-confirmation-dialog";
 import { useSubscription } from "@/hooks/use-subscription";
-
-interface Character {
-  id: string;
-  name: string;
-  genre: string;
-  imageUrl: string;
-  isLocked: boolean;
-  description: string;
-  unlocks: number;
-}
+import { Character } from "@/types/character";
 
 interface CharacterCardProps {
   character: Character;
@@ -65,6 +56,11 @@ export const CharacterCard = ({ character, onClick, onUnlock }: CharacterCardPro
           {character.isLocked && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
               <Lock className="h-8 w-8 text-white" />
+            </div>
+          )}
+          {!character.isLocked && character.loraFileId && (
+            <div className="absolute top-2 right-2 bg-[#553D8A]/80 text-white text-xs px-2 py-1 rounded-full">
+              LoRA
             </div>
           )}
         </div>

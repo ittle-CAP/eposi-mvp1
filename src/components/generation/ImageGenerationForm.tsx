@@ -3,6 +3,8 @@ import { CustomButton } from "@/components/ui/custom-button";
 import { Download, Share2, Image } from "lucide-react";
 import { Character } from "@/types/character";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { useState } from "react";
 
 interface ImageGenerationFormProps {
   selectedCharacter: string;
@@ -13,6 +15,8 @@ interface ImageGenerationFormProps {
   handleGenerate: () => void;
   generatedImageUrl: string;
   unlockedCharacters: Character[];
+  loraStrength?: number;
+  setLoraStrength?: (value: number) => void;
 }
 
 export const ImageGenerationForm = ({
@@ -24,7 +28,20 @@ export const ImageGenerationForm = ({
   handleGenerate,
   generatedImageUrl,
   unlockedCharacters,
+  loraStrength = 0.7,
+  setLoraStrength,
 }: ImageGenerationFormProps) => {
+  const [sliderValue, setSliderValue] = useState([loraStrength]);
+  
+  const handleSliderChange = (value: number[]) => {
+    setSliderValue(value);
+    if (setLoraStrength) {
+      setLoraStrength(value[0]);
+    }
+  };
+
+  const selectedCharacterData = unlockedCharacters.find(char => char.id === selectedCharacter);
+
   return (
     <div>
       <div className="mb-6">
@@ -66,6 +83,25 @@ export const ImageGenerationForm = ({
           rows={4}
         />
       </div>
+
+      {selectedCharacterData?.loraFileId && setLoraStrength && (
+        <div className="mb-6">
+          <label className="mb-2 block text-sm font-medium text-gray-700">
+            Character Strength: {sliderValue[0].toFixed(1)}
+          </label>
+          <Slider
+            value={sliderValue}
+            onValueChange={handleSliderChange}
+            max={1}
+            step={0.1}
+            min={0.1}
+            className="py-2"
+          />
+          <p className="mt-1 text-sm text-gray-500">
+            Adjust how strongly the character style appears in the generated image
+          </p>
+        </div>
+      )}
 
       <CustomButton
         onClick={handleGenerate}

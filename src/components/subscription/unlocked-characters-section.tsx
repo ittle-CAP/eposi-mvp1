@@ -1,11 +1,14 @@
 
-import { User } from "lucide-react";
+import { User, Sparkles } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface UnlockedCharacter {
   id: string;
   character_id: string;
   character_name: string;
   last_used_at: string;
+  lora_file_id?: string;
+  lora_strength?: number;
 }
 
 interface UnlockedCharactersSectionProps {
@@ -29,11 +32,27 @@ export const UnlockedCharactersSection = ({ characters }: UnlockedCharactersSect
               alt={character.character_name}
               className="h-16 w-16 rounded-lg object-cover bg-gray-100"
             />
-            <div>
-              <h3 className="font-medium text-gray-900">{character.character_name}</h3>
+            <div className="flex-1">
+              <div className="flex items-center">
+                <h3 className="font-medium text-gray-900">{character.character_name}</h3>
+                {character.lora_file_id && (
+                  <Badge 
+                    variant="outline" 
+                    className="ml-2 bg-[#553D8A]/10 text-[#553D8A] border-[#553D8A]/20 flex items-center gap-1"
+                  >
+                    <Sparkles className="h-3 w-3" />
+                    <span className="text-xs">LoRA</span>
+                  </Badge>
+                )}
+              </div>
               <p className="text-sm text-gray-500">
                 Last used: {character.last_used_at ? new Date(character.last_used_at).toLocaleDateString() : 'Never'}
               </p>
+              {character.lora_strength !== undefined && character.lora_file_id && (
+                <p className="text-xs text-gray-500 mt-1">
+                  LoRA strength: {character.lora_strength.toFixed(1)}
+                </p>
+              )}
             </div>
           </div>
         ))}

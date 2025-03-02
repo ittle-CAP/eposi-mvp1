@@ -5,16 +5,8 @@ import { CustomButton } from "@/components/ui/custom-button";
 import { UnlockConfirmationDialog } from "@/components/characters/unlock-confirmation-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
-
-interface Character {
-  id: string;
-  name: string;
-  genre: string;
-  imageUrl: string;
-  isLocked: boolean;
-  description: string;
-  unlocks: number;
-}
+import { Character } from "@/types/character";
+import { Badge } from "@/components/ui/badge";
 
 interface CharacterDialogProps {
   character: Character | null;
@@ -49,7 +41,14 @@ export const CharacterDialog = ({ character, onClose, onUnlock }: CharacterDialo
       <Dialog open={!!character} onOpenChange={onClose}>
         <DialogContent className="max-h-[85vh] w-full max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{character.name}</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              {character.name}
+              {!character.isLocked && character.loraFileId && (
+                <Badge variant="outline" className="ml-2 bg-[#553D8A]/10 text-[#553D8A] border-[#553D8A]/20">
+                  LoRA Enabled
+                </Badge>
+              )}
+            </DialogTitle>
           </DialogHeader>
 
           <ScrollArea className="h-full max-h-[calc(85vh-8rem)] pr-4">
@@ -69,6 +68,18 @@ export const CharacterDialog = ({ character, onClose, onUnlock }: CharacterDialo
                     Unlocks: {character.unlocks.toLocaleString()}
                   </span>
                 </div>
+
+                {!character.isLocked && character.loraFileId && (
+                  <div className="rounded-lg bg-[#553D8A]/5 p-3 border border-[#553D8A]/10">
+                    <h4 className="font-medium text-[#553D8A]">AI Enhancement Information</h4>
+                    <p className="text-sm text-gray-600 mt-1">
+                      This character uses advanced AI technology to create unique images in the character's style.
+                      {character.loraStrength !== undefined && (
+                        <span> Default strength: {character.loraStrength.toFixed(1)}</span>
+                      )}
+                    </p>
+                  </div>
+                )}
 
                 {character.isLocked ? (
                   <CustomButton
