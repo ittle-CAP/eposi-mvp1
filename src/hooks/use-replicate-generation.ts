@@ -1,12 +1,13 @@
 
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { ReplicateGenerationOptions } from "@/types/replicate";
 import { 
   startImageGeneration, 
   checkGenerationStatus, 
   cancelReplicatePrediction 
 } from "@/services/replicate-service";
+import { ReplicateGenerationOptions } from "@/types/replicate";
+import { useErrorHandler } from "@/utils/error-handling";
+import { useToast } from "@/hooks/use-toast";
 
 export const useReplicateGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -14,6 +15,7 @@ export const useReplicateGeneration = () => {
   const [predictionId, setPredictionId] = useState<string>("");
   const [generationStatus, setGenerationStatus] = useState<string>("");
   const { toast } = useToast();
+  const { handleApiError, handleGenerationError } = useErrorHandler();
 
   const pollGenerationStatus = async (id: string) => {
     // If we don't have a prediction ID, we can't check status
@@ -43,22 +45,16 @@ export const useReplicateGeneration = () => {
       
       // If it failed, show an error
       if (prediction.status === "failed" || prediction.error) {
-        toast({
-          title: "Generation Failed",
-          description: prediction.error || "Unknown error occurred",
-          variant: "destructive",
-        });
+        handleGenerationError(
+          prediction.error || "Unknown generation error", 
+          "Image"
+        );
       }
       
       // Regardless of outcome, we're no longer generating
       setIsGenerating(false);
     } catch (error) {
-      console.error("Error checking generation status:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to check generation status",
-        variant: "destructive",
-      });
+      handleApiError(error, "checking generation status");
       setIsGenerating(false);
       setGenerationStatus("failed");
     }
@@ -80,12 +76,7 @@ export const useReplicateGeneration = () => {
       await pollGenerationStatus(response.id);
       return true;
     } catch (error) {
-      console.error("Error generating image:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to generate image",
-        variant: "destructive",
-      });
+      handleGenerationError(error, "Image");
       setIsGenerating(false);
       setGenerationStatus("failed");
       return false;

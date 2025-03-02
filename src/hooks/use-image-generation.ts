@@ -4,12 +4,15 @@ import { useToast } from "@/hooks/use-toast";
 import { useCharacterManagement } from "./use-character-management";
 import { useReplicateGeneration } from "./use-replicate-generation";
 import { ReplicateGenerationOptions } from "@/types/replicate";
+import { useErrorHandler } from "@/utils/error-handling";
 
 export const useImageGeneration = () => {
   const [prompt, setPrompt] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string>("");
   const { toast } = useToast();
+  const { handleGenerationError } = useErrorHandler();
+  
   const {
     selectedCharacter,
     setSelectedCharacter,
@@ -85,12 +88,7 @@ export const useImageGeneration = () => {
         updateCharacterLastUsed(character.id);
       }
     } catch (error) {
-      console.error("Error generating image:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to generate image",
-        variant: "destructive",
-      });
+      handleGenerationError(error, "Image");
     }
   };
 
