@@ -98,7 +98,7 @@ export const VideoGenerationForm = ({
         className="mb-6 w-full flex items-center justify-center gap-2"
       >
         <Video className="h-4 w-4" />
-        Generate Video
+        Generate
       </CustomButton>
 
       {generatedVideoUrl && (

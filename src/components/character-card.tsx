@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Lock, Sparkles } from "lucide-react";
+import { Lock } from "lucide-react";
 import { CustomButton } from "@/components/ui/custom-button";
 import { useNavigate } from "react-router-dom";
 import { UnlockConfirmationDialog } from "@/components/characters/unlock-confirmation-dialog";
@@ -59,17 +59,6 @@ export const CharacterCard = ({ character, onClick, onUnlock }: CharacterCardPro
               <Lock className="h-8 w-8 text-white" />
             </div>
           )}
-          {!character.isLocked && character.loraFileId && (
-            <div className="absolute top-2 right-2">
-              <Badge 
-                variant="outline" 
-                className="bg-[#553D8A]/80 text-white border-[#553D8A]/20 flex items-center gap-1"
-              >
-                <Sparkles className="h-3 w-3" />
-                <span className="text-xs">LoRA</span>
-              </Badge>
-            </div>
-          )}
         </div>
         
         <div className="p-4">
@@ -81,7 +70,7 @@ export const CharacterCard = ({ character, onClick, onUnlock }: CharacterCardPro
             variant={character.isLocked ? "outline" : "default"}
             onClick={character.isLocked ? handleUnlock : handleGenerateClick}
           >
-            {character.isLocked ? "Unlock" : "Generate Video"}
+            {character.isLocked ? "Unlock" : "Generate"}
           </CustomButton>
         </div>
       </div>
