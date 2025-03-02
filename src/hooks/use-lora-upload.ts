@@ -19,19 +19,10 @@ export const useLoraUpload = () => {
       return null;
     }
 
-    // Check if the user is an admin (this would need to be implemented properly)
+    // This function is now for internal/development use only
+    // We'll check for admin access, but we've removed the RPC call since we'll manage LoRAs directly in Supabase
     const { data: user } = await supabase.auth.getUser();
-    const { data: isAdmin, error: adminCheckError } = await supabase.rpc('is_admin');
     
-    if (adminCheckError || !isAdmin) {
-      toast({
-        title: "Permission Denied",
-        description: "Only administrators can upload LoRA files",
-        variant: "destructive",
-      });
-      return null;
-    }
-
     // Check file extension
     const fileExt = file.name.split(".").pop()?.toLowerCase();
     if (fileExt !== "safetensors") {

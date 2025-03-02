@@ -60,7 +60,6 @@ const Characters = () => {
         setSearchQuery={setSearchQuery}
         selectedGenre={selectedGenre}
         setSelectedGenre={setSelectedGenre}
-        characters={characters}
       />
 
       <CharacterGrid
