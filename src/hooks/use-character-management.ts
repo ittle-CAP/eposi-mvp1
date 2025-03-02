@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Character } from "@/types/character";
@@ -75,13 +74,18 @@ export const useCharacterManagement = () => {
           genre: "Fantasy",
           imageUrl: "https://images.unsplash.com/photo-1438565434616-3ef039228b15",
           description: "The legendary ruler of the mountain realms, wielding ancient magic.",
+        },
+        "8": {
+          name: "The Headless Horseman",
+          genre: "Horror",
+          imageUrl: "/lovable-uploads/a1a65596-c4c6-47fe-9908-2664f60bfa8b.png",
+          description: "A terrifying spectral figure from Sleepy Hollow who rides through the night on his demonic steed. With a flaming jack-o'-lantern in place of his head, he strikes fear into the hearts of all who cross his path, doomed to eternally search for his missing head.",
         }
       };
 
       const characters: Character[] = unlockedData.map(char => {
         const presetData = characterData[char.character_id as keyof typeof characterData];
         
-        // Extract LoRA file info if available
         let loraFileId = null;
         let loraFileUrl = null;
         let loraStrength = char.lora_strength || 0.7;

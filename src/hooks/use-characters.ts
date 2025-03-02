@@ -73,6 +73,16 @@ export const useCharacters = () => {
 
   const characters: Character[] = [
     {
+      id: "8",
+      name: "The Headless Horseman",
+      genre: "Horror",
+      imageUrl: "/lovable-uploads/a1a65596-c4c6-47fe-9908-2664f60bfa8b.png",
+      isLocked: !unlockedCharacterIds.includes("8"),
+      description: "A terrifying spectral figure from Sleepy Hollow who rides through the night on his demonic steed. With a flaming jack-o'-lantern in place of his head, he strikes fear into the hearts of all who cross his path, doomed to eternally search for his missing head.",
+      unlocks: 666,
+      ...(characterLoras["8"] || {})
+    },
+    {
       id: "1",
       name: "Luna",
       genre: "Fantasy",
