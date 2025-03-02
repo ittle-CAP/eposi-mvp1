@@ -19,13 +19,13 @@ const NotFound = () => {
       <div className="max-w-md w-full text-center space-y-8">
         {/* Ghost Character Animation */}
         <div className="relative mx-auto w-32 h-32 mb-6 animate-float">
-          <Ghost className="w-full h-full text-saga-400" strokeWidth={1.5} />
-          <div className="absolute -bottom-4 w-full h-1 bg-gray-200 rounded-full opacity-30"></div>
+          <Ghost className="w-full h-full text-[#553D8A]" strokeWidth={1.5} />
+          <div className="absolute -bottom-4 w-full h-1 bg-[#553D8A]/20 rounded-full opacity-30"></div>
         </div>
         
         {/* Error Content */}
         <div className="space-y-3">
-          <h1 className="text-6xl font-extrabold text-saga-600">404</h1>
+          <h1 className="text-6xl font-extrabold text-[#553D8A]">404</h1>
           <h2 className="text-2xl font-bold text-gray-800">Oops! Page not found</h2>
           <p className="text-gray-600 mt-2">
             Looks like this page has gone ghost! We've searched high and low,
@@ -37,7 +37,7 @@ const NotFound = () => {
         <div className="pt-6 flex flex-col sm:flex-row gap-3 justify-center">
           <Button 
             variant="default" 
-            className="gap-2"
+            className="gap-2 bg-[#553D8A] hover:bg-[#553D8A]/90"
             onClick={() => window.location.href = "/"}
           >
             <Home size={18} />
@@ -45,7 +45,7 @@ const NotFound = () => {
           </Button>
           <Button 
             variant="outline" 
-            className="gap-2"
+            className="gap-2 border-[#553D8A] text-[#553D8A] hover:bg-[#553D8A]/10"
             onClick={() => window.history.back()}
           >
             <RotateCcw size={18} />
