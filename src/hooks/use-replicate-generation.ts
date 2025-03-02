@@ -30,7 +30,7 @@ export const useReplicateGeneration = () => {
   const [generationStatus, setGenerationStatus] = useState<string>("");
   const { toast } = useToast();
 
-  const generateImage = async (options: ReplicateGenerationOptions) => {
+  const generateImage = async (options: ReplicateGenerationOptions): Promise<boolean> => {
     setIsGenerating(true);
     setGenerationStatus("starting");
     setGeneratedImageUrl("");
@@ -66,6 +66,7 @@ export const useReplicateGeneration = () => {
       
       // Poll for results
       await checkGenerationStatus(data.id);
+      return true;
     } catch (error) {
       console.error("Error generating image:", error);
       toast({
@@ -75,6 +76,7 @@ export const useReplicateGeneration = () => {
       });
       setIsGenerating(false);
       setGenerationStatus("failed");
+      return false;
     }
   };
 
@@ -93,6 +95,7 @@ export const useReplicateGeneration = () => {
       }
       
       const prediction = data as ReplicateResponse;
+      console.log("Prediction status:", prediction.status, prediction);
       setGenerationStatus(prediction.status);
       
       // If it's still processing, poll again in a moment
@@ -103,6 +106,7 @@ export const useReplicateGeneration = () => {
       
       // If it succeeded, set the image URL
       if (prediction.status === "succeeded" && prediction.output && prediction.output.length > 0) {
+        console.log("Generated image URL:", prediction.output[0]);
         setGeneratedImageUrl(prediction.output[0]);
         toast({
           title: "Success!",

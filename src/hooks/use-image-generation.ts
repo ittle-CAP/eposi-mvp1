@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useCharacterManagement } from "./use-character-management";
+import { useReplicateGeneration } from "./use-replicate-generation";
 
 export const useImageGeneration = () => {
   const [prompt, setPrompt] = useState<string>("");
@@ -14,6 +15,13 @@ export const useImageGeneration = () => {
     loraStrength,
     updateCharacterLastUsed
   } = useCharacterManagement();
+  
+  const { 
+    generateImage: replicateGenerateImage,
+    isGenerating: replicateIsGenerating,
+    generationStatus,
+    cancelGeneration,
+  } = useReplicateGeneration();
 
   const handleImageGenerate = async () => {
     setIsGenerating(true);
@@ -24,19 +32,39 @@ export const useImageGeneration = () => {
         throw new Error("Character not found");
       }
       
-      // In a real implementation, we would call our backend API with the LoRA file information
       console.log(`Generating image with LoRA: ${character.loraFileId}, strength: ${loraStrength}`);
       
-      // For now, just show a placeholder
-      setTimeout(() => {
-        setGeneratedImageUrl("https://picsum.photos/512/512");
-        setIsGenerating(false);
+      // Use the Replicate generation if we have a LoRA file URL
+      if (character.loraFileUrl) {
+        // Start the generation process
+        const success = await replicateGenerateImage({
+          prompt: prompt,
+          loraUrl: character.loraFileUrl,
+          loraStrength: loraStrength,
+          width: 512,
+          height: 512,
+          steps: 30
+        });
         
-        // Update the last used timestamp for the character
-        if (character) {
-          updateCharacterLastUsed(character.id);
+        if (success) {
+          // The image URL will be updated by the useReplicateGeneration hook
+          // and reflected in the UI automatically
+          if (character) {
+            updateCharacterLastUsed(character.id);
+          }
         }
-      }, 2000);
+      } else {
+        // Fallback to placeholder for demo purposes
+        setTimeout(() => {
+          setGeneratedImageUrl("https://picsum.photos/512/512");
+          setIsGenerating(false);
+          
+          // Update the last used timestamp for the character
+          if (character) {
+            updateCharacterLastUsed(character.id);
+          }
+        }, 2000);
+      }
     } catch (error) {
       console.error("Error generating image:", error);
       toast({
@@ -48,12 +76,21 @@ export const useImageGeneration = () => {
     }
   };
 
+  // Sync the isGenerating state with the Replicate generation status
+  if (!isGenerating && replicateIsGenerating) {
+    setIsGenerating(true);
+  } else if (isGenerating && !replicateIsGenerating && generationStatus !== "processing") {
+    setIsGenerating(false);
+  }
+
   return {
     prompt,
     setPrompt,
     isGenerating,
     generatedImageUrl,
     handleImageGenerate,
-    setGeneratedImageUrl
+    setGeneratedImageUrl,
+    generationStatus,
+    cancelGeneration
   };
 };
