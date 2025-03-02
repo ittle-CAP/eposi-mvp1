@@ -131,12 +131,17 @@ serve(async (req) => {
       }
     } else {
       // Fallback to standard Stability AI model
-      console.log("Using standard Stability AI model");
+      console.log("Using standard Stability AI model - explicitly with NO LoRAs");
       try {
         // Updated to a currently valid model version for SDXL
         prediction = await replicate.predictions.create({
           version: "39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b", // Updated SDXL model version
-          input: input
+          input: {
+            ...input,
+            // Explicitly set empty LoRA parameters to override any defaults
+            lora_urls: "",
+            lora_scales: 0
+          }
         });
       } catch (sdxlError) {
         console.error("Error creating SDXL prediction:", sdxlError);
