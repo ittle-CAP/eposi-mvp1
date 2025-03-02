@@ -12,7 +12,13 @@ const Characters = () => {
   const { characters, unlockedCharacterIds, fetchUnlockedCharacters } = useCharacters();
   const { unlockCharacter } = useSubscription();
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
-  const { filterCharacters, searchTerm, setSearchTerm, selectedGenre, setSelectedGenre } = useCharacterFilter();
+  const { 
+    searchQuery, 
+    setSearchQuery, 
+    selectedGenre, 
+    setSelectedGenre, 
+    filteredCharacters 
+  } = useCharacterFilter(characters);
 
   useEffect(() => {
     document.title = "Characters | AI Video Generator";
@@ -39,8 +45,6 @@ const Characters = () => {
     setSelectedCharacter(null);
   };
 
-  const filteredCharacters = filterCharacters(characters);
-
   return (
     <div className="container mx-auto py-8">
       <div className="mb-8">
@@ -52,8 +56,8 @@ const Characters = () => {
       </div>
 
       <SearchFilter
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
         selectedGenre={selectedGenre}
         setSelectedGenre={setSelectedGenre}
         characters={characters}
