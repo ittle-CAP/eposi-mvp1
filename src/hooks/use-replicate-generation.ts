@@ -1,27 +1,12 @@
 
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
-interface ReplicateGenerationOptions {
-  prompt: string;
-  loraUrl?: string;
-  loraStrength?: number;
-  negativePrompt?: string;
-  width?: number;
-  height?: number;
-  numOutputs?: number;
-  steps?: number;
-  guidanceScale?: number;
-  modelVersion?: string;
-}
-
-interface ReplicateResponse {
-  id: string;
-  status: "starting" | "processing" | "succeeded" | "failed" | "canceled";
-  output?: string[] | null;
-  error?: string | null;
-}
+import { ReplicateGenerationOptions } from "@/types/replicate";
+import { 
+  startImageGeneration, 
+  checkGenerationStatus, 
+  cancelReplicatePrediction 
+} from "@/services/replicate-service";
 
 export const useReplicateGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -30,99 +15,19 @@ export const useReplicateGeneration = () => {
   const [generationStatus, setGenerationStatus] = useState<string>("");
   const { toast } = useToast();
 
-  const generateImage = async (options: ReplicateGenerationOptions): Promise<boolean> => {
-    setIsGenerating(true);
-    setGenerationStatus("starting");
-    setGeneratedImageUrl("");
-    
-    try {
-      console.log("Starting image generation with Replicate:", options);
-      
-      // For demonstration without a LoRA, we can still generate a basic image
-      const body: Record<string, any> = {
-        prompt: options.prompt,
-        width: options.width,
-        height: options.height,
-        numOutputs: options.numOutputs,
-        steps: options.steps,
-        guidanceScale: options.guidanceScale,
-        modelVersion: options.modelVersion
-      };
-      
-      // Only include LoRA options if a LoRA URL is provided
-      if (options.loraUrl) {
-        body.loraUrl = options.loraUrl;
-        body.loraStrength = options.loraStrength || 0.7;
-      }
-      
-      if (options.negativePrompt) {
-        body.negativePrompt = options.negativePrompt;
-      }
-      
-      // Start image generation
-      const { data, error } = await supabase.functions.invoke("replicate-image", {
-        body: body
-      });
-
-      if (error) {
-        console.error("Error from Supabase function:", error);
-        throw new Error(`Error starting generation: ${error.message}`);
-      }
-
-      console.log("Response from replicate-image function:", data);
-
-      if (!data || !data.id) {
-        throw new Error("No prediction ID returned from the API");
-      }
-
-      // Store the prediction ID for status checks
-      setPredictionId(data.id);
-      setGenerationStatus("processing");
-      
-      // Poll for results
-      await checkGenerationStatus(data.id);
-      return true;
-    } catch (error) {
-      console.error("Error generating image:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to generate image",
-        variant: "destructive",
-      });
-      setIsGenerating(false);
-      setGenerationStatus("failed");
-      return false;
-    }
-  };
-
-  const checkGenerationStatus = async (id: string) => {
+  const pollGenerationStatus = async (id: string) => {
     // If we don't have a prediction ID, we can't check status
     if (!id) return;
     
     try {
-      console.log("Checking status for prediction:", id);
+      const prediction = await checkGenerationStatus(id);
       
-      // Check the status of the generation
-      const { data, error } = await supabase.functions.invoke("replicate-image", {
-        body: { predictionId: id }
-      });
-      
-      if (error) {
-        console.error("Error checking status:", error);
-        throw new Error(`Error checking status: ${error.message}`);
-      }
-      
-      if (!data) {
-        throw new Error("No data returned from status check");
-      }
-      
-      const prediction = data as ReplicateResponse;
       console.log("Prediction status:", prediction.status, prediction);
       setGenerationStatus(prediction.status);
       
       // If it's still processing, poll again in a moment
       if (prediction.status === "processing") {
-        setTimeout(() => checkGenerationStatus(id), 1500);
+        setTimeout(() => pollGenerationStatus(id), 1500);
         return;
       }
       
@@ -159,24 +64,39 @@ export const useReplicateGeneration = () => {
     }
   };
 
+  const generateImage = async (options: ReplicateGenerationOptions): Promise<boolean> => {
+    setIsGenerating(true);
+    setGenerationStatus("starting");
+    setGeneratedImageUrl("");
+    
+    try {
+      const response = await startImageGeneration(options);
+
+      // Store the prediction ID for status checks
+      setPredictionId(response.id);
+      setGenerationStatus("processing");
+      
+      // Poll for results
+      await pollGenerationStatus(response.id);
+      return true;
+    } catch (error) {
+      console.error("Error generating image:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate image",
+        variant: "destructive",
+      });
+      setIsGenerating(false);
+      setGenerationStatus("failed");
+      return false;
+    }
+  };
+
   const cancelGeneration = async () => {
     if (!predictionId) return;
     
     try {
-      console.log("Attempting to cancel prediction:", predictionId);
-      
-      // Call the cancel endpoint in Replicate via the edge function
-      const { error } = await supabase.functions.invoke("replicate-image", {
-        body: { 
-          predictionId,
-          cancel: true 
-        }
-      });
-      
-      if (error) {
-        console.error("Error canceling prediction:", error);
-        throw new Error(`Error canceling generation: ${error.message}`);
-      }
+      await cancelReplicatePrediction(predictionId);
       
       setIsGenerating(false);
       setGenerationStatus("canceled");
