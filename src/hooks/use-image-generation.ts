@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useCharacterManagement } from "./use-character-management";
 import { useReplicateGeneration } from "./use-replicate-generation";
+import { ReplicateGenerationOptions } from "@/types/replicate";
 
 export const useImageGeneration = () => {
   const [prompt, setPrompt] = useState<string>("");
@@ -62,15 +63,22 @@ export const useImageGeneration = () => {
       
       console.log(`Generating image with character: ${character.name}, LoRA: ${character.loraFileId || 'none'}, strength: ${loraStrength}`);
       
-      // Start the generation process with Replicate
-      const success = await replicateGenerateImage({
+      // Prepare generation options
+      const generationOptions: ReplicateGenerationOptions = {
         prompt: prompt,
-        loraUrl: character.loraFileUrl,
-        loraStrength: loraStrength,
         width: 512,
         height: 512,
         steps: 30
-      });
+      };
+      
+      // Only add LoRA options if the character has a LoRA file
+      if (character.loraFileUrl) {
+        generationOptions.loraUrl = character.loraFileUrl;
+        generationOptions.loraStrength = loraStrength;
+      }
+      
+      // Start the generation process with Replicate
+      const success = await replicateGenerateImage(generationOptions);
       
       if (success) {
         // The image URL will be updated by the useReplicateGeneration hook
@@ -93,14 +101,14 @@ export const useImageGeneration = () => {
     } else if (isGenerating && !replicateIsGenerating && generationStatus !== "processing") {
       setIsGenerating(false);
     }
-  }, [replicateIsGenerating, generationStatus]);
+  }, [replicateIsGenerating, generationStatus, isGenerating]);
 
   // Use the generated image URL from the Replicate hook
   useEffect(() => {
     if (replicateGeneratedImageUrl && replicateGeneratedImageUrl !== generatedImageUrl) {
       setGeneratedImageUrl(replicateGeneratedImageUrl);
     }
-  }, [replicateGeneratedImageUrl]);
+  }, [replicateGeneratedImageUrl, generatedImageUrl]);
 
   return {
     prompt,
