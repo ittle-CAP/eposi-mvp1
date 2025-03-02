@@ -11,6 +11,7 @@ export const useImageGeneration = () => {
   const { toast } = useToast();
   const {
     selectedCharacter,
+    setSelectedCharacter,
     unlockedCharacters,
     loraStrength,
     updateCharacterLastUsed,
@@ -29,6 +30,14 @@ export const useImageGeneration = () => {
   useEffect(() => {
     fetchUnlockedCharacters();
   }, []);
+
+  // Automatically select the first character if none is selected and characters are available
+  useEffect(() => {
+    if (!selectedCharacter && unlockedCharacters.length > 0) {
+      console.log("Auto-selecting first character:", unlockedCharacters[0].id);
+      setSelectedCharacter(unlockedCharacters[0].id);
+    }
+  }, [selectedCharacter, unlockedCharacters, setSelectedCharacter]);
 
   const handleImageGenerate = async () => {
     try {
@@ -101,6 +110,8 @@ export const useImageGeneration = () => {
     handleImageGenerate,
     setGeneratedImageUrl,
     generationStatus,
-    cancelGeneration
+    cancelGeneration,
+    selectedCharacter,
+    setSelectedCharacter
   };
 };

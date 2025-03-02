@@ -18,6 +18,8 @@ interface ImageGenerationFormProps {
   unlockedCharacters: Character[];
   loraStrength?: number;
   setLoraStrength?: (value: number) => void;
+  generationStatus?: string;
+  cancelGeneration?: () => void;
 }
 
 export const ImageGenerationForm = ({
@@ -31,14 +33,14 @@ export const ImageGenerationForm = ({
   unlockedCharacters,
   loraStrength = 0.7,
   setLoraStrength,
+  generationStatus,
+  cancelGeneration
 }: ImageGenerationFormProps) => {
   const [sliderValue, setSliderValue] = useState([loraStrength]);
   const { 
-    isGenerating, 
-    generatedImageUrl, 
-    generationStatus, 
+    isGenerating: localIsGenerating, 
+    generatedImageUrl: localGeneratedImageUrl, 
     generateImage, 
-    cancelGeneration 
   } = useReplicateGeneration();
   
   const handleSliderChange = (value: number[]) => {
@@ -51,31 +53,20 @@ export const ImageGenerationForm = ({
   const selectedCharacterData = unlockedCharacters.find(char => char.id === selectedCharacter);
 
   const handleReplicateGenerate = () => {
-    if (isGenerating) {
+    if (parentIsGenerating && cancelGeneration) {
       cancelGeneration();
       return;
     }
     
-    // If the selected character has a LoRA file, use it with Replicate
-    if (selectedCharacterData?.loraFileUrl) {
-      generateImage({
-        prompt: prompt,
-        loraUrl: selectedCharacterData.loraFileUrl,
-        loraStrength: sliderValue[0],
-      });
-    } else {
-      // Fall back to the original generation method
-      parentHandleGenerate();
-    }
+    // Use the parent generation method which is connected to useImageGeneration
+    parentHandleGenerate();
   };
 
   // Determine which image URL to display
-  const displayImageUrl = selectedCharacterData?.loraFileUrl ? 
-    generatedImageUrl : parentGeneratedImageUrl;
+  const displayImageUrl = parentGeneratedImageUrl;
   
   // Determine which loading state to use
-  const activeIsGenerating = selectedCharacterData?.loraFileUrl ? 
-    isGenerating : parentIsGenerating;
+  const activeIsGenerating = parentIsGenerating;
 
   return (
     <div>
@@ -138,7 +129,7 @@ export const ImageGenerationForm = ({
         </div>
       )}
 
-      {selectedCharacterData?.loraFileUrl && generationStatus === "processing" && (
+      {generationStatus === "processing" && (
         <div className="mb-6">
           <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
             <div className="h-full w-1/2 animate-pulse rounded-full bg-[#553D8A]"></div>
@@ -148,7 +139,7 @@ export const ImageGenerationForm = ({
       )}
 
       <CustomButton
-        onClick={selectedCharacterData?.loraFileUrl ? handleReplicateGenerate : parentHandleGenerate}
+        onClick={handleReplicateGenerate}
         isLoading={activeIsGenerating && generationStatus !== "processing"}
         disabled={!selectedCharacter || !prompt || (activeIsGenerating && generationStatus !== "processing")}
         className="mb-6 w-full flex items-center justify-center gap-2"

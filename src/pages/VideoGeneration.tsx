@@ -5,26 +5,39 @@ import { VideoGenerationForm } from "@/components/generation/VideoGenerationForm
 import { ImageGenerationForm } from "@/components/generation/ImageGenerationForm";
 import { GenerationLayout } from "@/components/generation/GenerationLayout";
 import { useVideoGeneration } from "@/hooks/use-video-generation";
+import { useImageGeneration } from "@/hooks/use-image-generation";
 
 const VideoGeneration = () => {
   const [searchParams] = useSearchParams();
   const {
-    selectedCharacter,
-    setSelectedCharacter,
+    selectedCharacter: videoSelectedCharacter,
+    setSelectedCharacter: setVideoSelectedCharacter,
     selectedImage,
     setSelectedImage,
-    prompt,
-    setPrompt,
+    prompt: videoPrompt,
+    setPrompt: setVideoPrompt,
     loraStrength,
     setLoraStrength,
-    isGenerating,
+    isGenerating: videoIsGenerating,
     generatedVideoUrl,
-    generatedImageUrl,
+    generatedImageUrl: videoGeneratedImageUrl,
     unlockedCharacters,
     fetchUnlockedCharacters,
     handleVideoGenerate,
-    handleImageGenerate
+    handleImageGenerate: handleVideoImageGenerate
   } = useVideoGeneration();
+
+  const {
+    prompt: imagePrompt,
+    setPrompt: setImagePrompt,
+    isGenerating: imageIsGenerating,
+    generatedImageUrl: imageGeneratedImageUrl,
+    handleImageGenerate,
+    selectedCharacter: imageSelectedCharacter,
+    setSelectedCharacter: setImageSelectedCharacter,
+    generationStatus,
+    cancelGeneration
+  } = useImageGeneration();
 
   useEffect(() => {
     fetchUnlockedCharacters();
@@ -33,31 +46,34 @@ const VideoGeneration = () => {
   useEffect(() => {
     const characterId = searchParams.get("character");
     if (characterId) {
-      setSelectedCharacter(characterId);
+      setVideoSelectedCharacter(characterId);
+      setImageSelectedCharacter(characterId);
     }
-  }, [searchParams, setSelectedCharacter]);
+  }, [searchParams, setVideoSelectedCharacter, setImageSelectedCharacter]);
 
   return (
     <GenerationLayout
       imageContent={
         <ImageGenerationForm
-          selectedCharacter={selectedCharacter}
-          setSelectedCharacter={setSelectedCharacter}
-          prompt={prompt}
-          setPrompt={setPrompt}
-          isGenerating={isGenerating}
+          selectedCharacter={imageSelectedCharacter}
+          setSelectedCharacter={setImageSelectedCharacter}
+          prompt={imagePrompt}
+          setPrompt={setImagePrompt}
+          isGenerating={imageIsGenerating}
           handleGenerate={handleImageGenerate}
-          generatedImageUrl={generatedImageUrl}
+          generatedImageUrl={imageGeneratedImageUrl}
           unlockedCharacters={unlockedCharacters}
           loraStrength={loraStrength}
           setLoraStrength={setLoraStrength}
+          generationStatus={generationStatus}
+          cancelGeneration={cancelGeneration}
         />
       }
       videoContent={
         <VideoGenerationForm
-          prompt={prompt}
-          setPrompt={setPrompt}
-          isGenerating={isGenerating}
+          prompt={videoPrompt}
+          setPrompt={setVideoPrompt}
+          isGenerating={videoIsGenerating}
           handleGenerate={handleVideoGenerate}
           generatedVideoUrl={generatedVideoUrl}
           selectedImage={selectedImage}
