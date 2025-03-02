@@ -36,6 +36,8 @@ export const useReplicateGeneration = () => {
     setGeneratedImageUrl("");
     
     try {
+      console.log("Starting image generation with Replicate:", options);
+      
       // Start image generation
       const { data, error } = await supabase.functions.invoke("replicate-image", {
         body: {
@@ -140,10 +142,31 @@ export const useReplicateGeneration = () => {
   const cancelGeneration = async () => {
     if (!predictionId) return;
     
-    setIsGenerating(false);
-    setGenerationStatus("canceled");
-    // In a real implementation, you would call an API to cancel the generation
-    // This would require an additional endpoint in your edge function
+    try {
+      // Call the cancel endpoint in Replicate via the edge function
+      const { error } = await supabase.functions.invoke("replicate-image", {
+        body: { 
+          predictionId,
+          cancel: true 
+        }
+      });
+      
+      if (error) {
+        throw new Error(`Error canceling generation: ${error.message}`);
+      }
+      
+      setIsGenerating(false);
+      setGenerationStatus("canceled");
+      toast({
+        title: "Canceled",
+        description: "Image generation was canceled",
+      });
+    } catch (error) {
+      console.error("Error canceling generation:", error);
+      // Even if the cancellation fails, update the UI
+      setIsGenerating(false);
+      setGenerationStatus("canceled");
+    }
   };
 
   return {

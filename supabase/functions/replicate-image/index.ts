@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import Replicate from "https://esm.sh/replicate@0.25.2"
 
@@ -47,12 +48,6 @@ serve(async (req) => {
       )
     }
 
-    // Default to SDXL if no specific model is specified
-    const modelVersion = body.modelVersion || "stability-ai/sdxl";
-    const loraUrl = body.loraUrl || null;
-    
-    console.log(`Generating image with model: ${modelVersion}, prompt: ${body.prompt}, LoRA: ${loraUrl || 'none'}`);
-    
     // Setup the base input
     const input = {
       prompt: body.prompt,
@@ -65,25 +60,25 @@ serve(async (req) => {
       guidance_scale: body.guidanceScale || 7.5,
     };
     
-    // Create a prediction using either the standard model or with LoRA
     let prediction;
     
-    if (loraUrl) {
-      // If we have a LoRA URL, use the cloneofsimo/lora model
-      console.log("Using cloneofsimo/lora model with LoRA:", loraUrl);
+    // If there's a LoRA URL, use the cloneofsimo/lora model
+    if (body.loraUrl) {
+      console.log("Using cloneofsimo/lora model with LoRA:", body.loraUrl, "strength:", body.loraStrength || 0.7);
       
       prediction = await replicate.predictions.create({
-        version: "cloneofsimo/lora:d074a7cd2291bc3bbd599a6b9b1236f56d71baba07e38136b2385b720969dee2",
+        version: "d074a7cd2291bc3bbd599a6b9b1236f56d71baba07e38136b2385b720969dee2", // cloneofsimo/lora latest version
         input: {
           ...input,
-          lora_urls: loraUrl,
+          lora_urls: body.loraUrl,
           lora_scales: body.loraStrength || 0.7,
         }
       });
     } else {
-      // Otherwise use the standard diffusion model
+      // Fallback to SDXL if no LoRA URL is provided
+      console.log("Using standard SDXL model");
       prediction = await replicate.predictions.create({
-        version: modelVersion,
+        version: "stability-ai/sdxl:2dad32def0ea1cae837b5dfa0ab8c3045acb84cc7024b4bb52e41ed84e0d62bd",
         input: input
       });
     }
