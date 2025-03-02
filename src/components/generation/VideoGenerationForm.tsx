@@ -44,9 +44,9 @@ export const VideoGenerationForm = ({
           Upload Base Image
         </label>
         
-        <div className="flex gap-4">
+        <div className="grid grid-cols-5 gap-4">
           <div 
-            className={`relative flex-1 h-48 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center ${previewUrl ? 'bg-white' : 'bg-gray-50'}`}
+            className="col-span-3 relative h-48 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center"
           >
             {previewUrl ? (
               <img
@@ -70,10 +70,10 @@ export const VideoGenerationForm = ({
           
           <CustomButton 
             variant="outline"
-            className="flex-shrink-0 self-center h-12"
+            className="col-span-2 h-48 flex flex-col items-center justify-center"
           >
-            <Image className="h-4 w-4 mr-2" />
-            Choose From Creations
+            <Image className="h-8 w-8 mb-2" />
+            <span className="text-center">Choose From Creations</span>
           </CustomButton>
         </div>
       </div>
