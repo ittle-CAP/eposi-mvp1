@@ -25,6 +25,27 @@ serve(async (req) => {
     });
 
     const body = await req.json()
+    console.log("Request body:", JSON.stringify(body))
+
+    // If it's a cancel request
+    if (body.predictionId && body.cancel) {
+      console.log("Canceling prediction:", body.predictionId)
+      try {
+        await replicate.predictions.cancel(body.predictionId)
+        return new Response(JSON.stringify({ status: "canceled" }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      } catch (cancelError) {
+        console.error("Error canceling prediction:", cancelError)
+        return new Response(JSON.stringify({ 
+          error: "Failed to cancel prediction",
+          details: cancelError.message 
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500,
+        })
+      }
+    }
 
     // If it's a status check request
     if (body.predictionId) {
@@ -49,7 +70,7 @@ serve(async (req) => {
     }
 
     // Setup the base input
-    const input = {
+    const input: Record<string, any> = {
       prompt: body.prompt,
       negative_prompt: body.negativePrompt || "",
       width: body.width || 512,

@@ -38,27 +38,40 @@ export const useReplicateGeneration = () => {
     try {
       console.log("Starting image generation with Replicate:", options);
       
+      // For demonstration without a LoRA, we can still generate a basic image
+      const body: Record<string, any> = {
+        prompt: options.prompt,
+        width: options.width,
+        height: options.height,
+        numOutputs: options.numOutputs,
+        steps: options.steps,
+        guidanceScale: options.guidanceScale,
+        modelVersion: options.modelVersion
+      };
+      
+      // Only include LoRA options if a LoRA URL is provided
+      if (options.loraUrl) {
+        body.loraUrl = options.loraUrl;
+        body.loraStrength = options.loraStrength || 0.7;
+      }
+      
+      if (options.negativePrompt) {
+        body.negativePrompt = options.negativePrompt;
+      }
+      
       // Start image generation
       const { data, error } = await supabase.functions.invoke("replicate-image", {
-        body: {
-          prompt: options.prompt,
-          loraUrl: options.loraUrl,
-          loraStrength: options.loraStrength || 0.7,
-          negativePrompt: options.negativePrompt,
-          width: options.width,
-          height: options.height,
-          numOutputs: options.numOutputs,
-          steps: options.steps,
-          guidanceScale: options.guidanceScale,
-          modelVersion: options.modelVersion
-        }
+        body: body
       });
 
       if (error) {
+        console.error("Error from Supabase function:", error);
         throw new Error(`Error starting generation: ${error.message}`);
       }
 
-      if (!data.id) {
+      console.log("Response from replicate-image function:", data);
+
+      if (!data || !data.id) {
         throw new Error("No prediction ID returned from the API");
       }
 
@@ -87,13 +100,20 @@ export const useReplicateGeneration = () => {
     if (!id) return;
     
     try {
+      console.log("Checking status for prediction:", id);
+      
       // Check the status of the generation
       const { data, error } = await supabase.functions.invoke("replicate-image", {
         body: { predictionId: id }
       });
       
       if (error) {
+        console.error("Error checking status:", error);
         throw new Error(`Error checking status: ${error.message}`);
+      }
+      
+      if (!data) {
+        throw new Error("No data returned from status check");
       }
       
       const prediction = data as ReplicateResponse;
@@ -102,7 +122,7 @@ export const useReplicateGeneration = () => {
       
       // If it's still processing, poll again in a moment
       if (prediction.status === "processing") {
-        setTimeout(() => checkGenerationStatus(id), 1000);
+        setTimeout(() => checkGenerationStatus(id), 1500);
         return;
       }
       
@@ -143,6 +163,8 @@ export const useReplicateGeneration = () => {
     if (!predictionId) return;
     
     try {
+      console.log("Attempting to cancel prediction:", predictionId);
+      
       // Call the cancel endpoint in Replicate via the edge function
       const { error } = await supabase.functions.invoke("replicate-image", {
         body: { 
@@ -152,6 +174,7 @@ export const useReplicateGeneration = () => {
       });
       
       if (error) {
+        console.error("Error canceling prediction:", error);
         throw new Error(`Error canceling generation: ${error.message}`);
       }
       

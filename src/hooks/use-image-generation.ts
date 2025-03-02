@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useCharacterManagement } from "./use-character-management";
 import { useReplicateGeneration } from "./use-replicate-generation";
@@ -13,7 +13,8 @@ export const useImageGeneration = () => {
     selectedCharacter,
     unlockedCharacters,
     loraStrength,
-    updateCharacterLastUsed
+    updateCharacterLastUsed,
+    fetchUnlockedCharacters
   } = useCharacterManagement();
   
   const { 
@@ -24,15 +25,33 @@ export const useImageGeneration = () => {
     cancelGeneration,
   } = useReplicateGeneration();
 
+  // Ensure the characters are loaded
+  useEffect(() => {
+    fetchUnlockedCharacters();
+  }, []);
+
   const handleImageGenerate = async () => {
     try {
+      // Check if we have any unlocked characters first
+      if (unlockedCharacters.length === 0) {
+        console.log("No unlocked characters available");
+        throw new Error("No characters available. Please unlock a character first.");
+      }
+
+      // Check if a character is selected
+      if (!selectedCharacter) {
+        console.log("No character selected");
+        throw new Error("Please select a character first");
+      }
+      
       const character = unlockedCharacters.find(char => char.id === selectedCharacter);
       
       if (!character) {
-        throw new Error("Character not found");
+        console.log(`Character not found: ${selectedCharacter}. Available characters:`, unlockedCharacters.map(c => c.id));
+        throw new Error("Character not found. Please select a different character.");
       }
       
-      console.log(`Generating image with LoRA: ${character.loraFileId}, strength: ${loraStrength}`);
+      console.log(`Generating image with character: ${character.name}, LoRA: ${character.loraFileId || 'none'}, strength: ${loraStrength}`);
       
       // Start the generation process with Replicate
       const success = await replicateGenerateImage({
@@ -46,31 +65,33 @@ export const useImageGeneration = () => {
       
       if (success) {
         // The image URL will be updated by the useReplicateGeneration hook
-        if (character) {
-          updateCharacterLastUsed(character.id);
-        }
+        updateCharacterLastUsed(character.id);
       }
     } catch (error) {
       console.error("Error generating image:", error);
       toast({
         title: "Error",
-        description: "Failed to generate image",
+        description: error.message || "Failed to generate image",
         variant: "destructive",
       });
     }
   };
 
   // Sync the isGenerating state with the Replicate generation status
-  if (!isGenerating && replicateIsGenerating) {
-    setIsGenerating(true);
-  } else if (isGenerating && !replicateIsGenerating && generationStatus !== "processing") {
-    setIsGenerating(false);
-  }
+  useEffect(() => {
+    if (!isGenerating && replicateIsGenerating) {
+      setIsGenerating(true);
+    } else if (isGenerating && !replicateIsGenerating && generationStatus !== "processing") {
+      setIsGenerating(false);
+    }
+  }, [replicateIsGenerating, generationStatus]);
 
   // Use the generated image URL from the Replicate hook
-  if (replicateGeneratedImageUrl && replicateGeneratedImageUrl !== generatedImageUrl) {
-    setGeneratedImageUrl(replicateGeneratedImageUrl);
-  }
+  useEffect(() => {
+    if (replicateGeneratedImageUrl && replicateGeneratedImageUrl !== generatedImageUrl) {
+      setGeneratedImageUrl(replicateGeneratedImageUrl);
+    }
+  }, [replicateGeneratedImageUrl]);
 
   return {
     prompt,
