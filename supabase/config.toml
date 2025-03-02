@@ -1,1 +1,5 @@
-project_id = "orgbsbthfitvsrgpazas"
+
+project_id = "your-project-id"
+
+[functions.replicate-image]
+verify_jwt = false

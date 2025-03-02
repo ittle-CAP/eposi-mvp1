@@ -1,10 +1,11 @@
 
 import { CustomButton } from "@/components/ui/custom-button";
-import { Download, Share2, Image } from "lucide-react";
+import { Download, Share2, Image, X } from "lucide-react";
 import { Character } from "@/types/character";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { useState } from "react";
+import { useReplicateGeneration } from "@/hooks/use-replicate-generation";
 
 interface ImageGenerationFormProps {
   selectedCharacter: string;
@@ -24,14 +25,21 @@ export const ImageGenerationForm = ({
   setSelectedCharacter,
   prompt,
   setPrompt,
-  isGenerating,
-  handleGenerate,
-  generatedImageUrl,
+  isGenerating: parentIsGenerating,
+  handleGenerate: parentHandleGenerate,
+  generatedImageUrl: parentGeneratedImageUrl,
   unlockedCharacters,
   loraStrength = 0.7,
   setLoraStrength,
 }: ImageGenerationFormProps) => {
   const [sliderValue, setSliderValue] = useState([loraStrength]);
+  const { 
+    isGenerating, 
+    generatedImageUrl, 
+    generationStatus, 
+    generateImage, 
+    cancelGeneration 
+  } = useReplicateGeneration();
   
   const handleSliderChange = (value: number[]) => {
     setSliderValue(value);
@@ -41,6 +49,33 @@ export const ImageGenerationForm = ({
   };
 
   const selectedCharacterData = unlockedCharacters.find(char => char.id === selectedCharacter);
+
+  const handleReplicateGenerate = () => {
+    if (isGenerating) {
+      cancelGeneration();
+      return;
+    }
+    
+    // If the selected character has a LoRA file, use it with Replicate
+    if (selectedCharacterData?.loraFileUrl) {
+      generateImage({
+        prompt: prompt,
+        loraUrl: selectedCharacterData.loraFileUrl,
+        loraStrength: sliderValue[0],
+      });
+    } else {
+      // Fall back to the original generation method
+      parentHandleGenerate();
+    }
+  };
+
+  // Determine which image URL to display
+  const displayImageUrl = selectedCharacterData?.loraFileUrl ? 
+    generatedImageUrl : parentGeneratedImageUrl;
+  
+  // Determine which loading state to use
+  const activeIsGenerating = selectedCharacterData?.loraFileUrl ? 
+    isGenerating : parentIsGenerating;
 
   return (
     <div>
@@ -103,21 +138,39 @@ export const ImageGenerationForm = ({
         </div>
       )}
 
+      {selectedCharacterData?.loraFileUrl && generationStatus === "processing" && (
+        <div className="mb-6">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+            <div className="h-full w-1/2 animate-pulse rounded-full bg-[#553D8A]"></div>
+          </div>
+          <p className="mt-2 text-center text-sm text-gray-500">Generating your image...</p>
+        </div>
+      )}
+
       <CustomButton
-        onClick={handleGenerate}
-        isLoading={isGenerating}
-        disabled={!selectedCharacter || !prompt || isGenerating}
+        onClick={selectedCharacterData?.loraFileUrl ? handleReplicateGenerate : parentHandleGenerate}
+        isLoading={activeIsGenerating && generationStatus !== "processing"}
+        disabled={!selectedCharacter || !prompt || (activeIsGenerating && generationStatus !== "processing")}
         className="mb-6 w-full flex items-center justify-center gap-2"
       >
-        <Image className="h-4 w-4" />
-        Generate Image
+        {activeIsGenerating && generationStatus === "processing" ? (
+          <>
+            <X className="h-4 w-4" />
+            Cancel Generation
+          </>
+        ) : (
+          <>
+            <Image className="h-4 w-4" />
+            Generate Image
+          </>
+        )}
       </CustomButton>
 
-      {generatedImageUrl && (
+      {displayImageUrl && (
         <div className="space-y-4">
           <div className="aspect-square w-full rounded-lg bg-gray-100 overflow-hidden">
             <img
-              src={generatedImageUrl}
+              src={displayImageUrl}
               alt="Generated content"
               className="h-full w-full object-cover rounded-lg"
             />
