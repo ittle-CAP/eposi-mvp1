@@ -40,10 +40,21 @@ export const startImageGeneration = async (options: ReplicateGenerationOptions):
       throw new Error(errorMessage);
     }
 
+    if (!data) {
+      console.error("Empty response from Supabase function");
+      throw new Error("No response received from the image generation API");
+    }
+
     console.log("Response from replicate-image function:", data);
 
-    if (!data || !data.id) {
+    if (!data.id) {
       console.error("Invalid response:", data);
+      
+      // If there's an error message in the response, use it
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
       throw new Error("No prediction ID returned from the API");
     }
 

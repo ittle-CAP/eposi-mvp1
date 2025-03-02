@@ -110,8 +110,9 @@ serve(async (req) => {
       console.log("Using cloneofsimo/lora model with LoRA:", body.loraUrl, "strength:", body.loraStrength || 0.7);
       
       try {
+        // Updated to a currently valid model version for LoRA
         prediction = await replicate.predictions.create({
-          version: "d074a7cd2291bc3bbd599a6b9b1236f56d71baba07e38136b2385b720969dee2", // cloneofsimo/lora latest version
+          version: "6677de4c1108133a4c1837da1da9c8bbaea6b2c2836970f0fb7c83443869eda5", // Updated LoRA model version
           input: {
             ...input,
             lora_urls: body.loraUrl,
@@ -129,11 +130,12 @@ serve(async (req) => {
         });
       }
     } else {
-      // Fallback to SDXL if no LoRA URL is provided
-      console.log("Using standard SDXL model");
+      // Fallback to standard Stability AI model
+      console.log("Using standard Stability AI model");
       try {
+        // Updated to a currently valid model version for SDXL
         prediction = await replicate.predictions.create({
-          version: "stability-ai/sdxl:2dad32def0ea1cae837b5dfa0ab8c3045acb84cc7024b4bb52e41ed84e0d62bd",
+          version: "39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b", // Updated SDXL model version
           input: input
         });
       } catch (sdxlError) {
@@ -157,7 +159,7 @@ serve(async (req) => {
     console.error("Error in replicate function:", error);
     return new Response(JSON.stringify({ 
       error: error.message,
-      details: "This might be related to API key issues or configuration problems with Replicate."
+      details: "This might be related to API key issues, model versions, or configuration problems with Replicate."
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
