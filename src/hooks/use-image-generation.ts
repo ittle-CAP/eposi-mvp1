@@ -6,6 +6,18 @@ import { useReplicateGeneration } from "./use-replicate-generation";
 import { ReplicateGenerationOptions } from "@/types/replicate";
 import { useErrorHandler } from "@/utils/error-handling";
 
+// Define trigger words for characters
+const CHARACTER_TRIGGER_WORDS: Record<string, string[]> = {
+  "8": ["headless", "horse rider", "pumpkin"], // The Headless Horseman
+  "1": [], // Luna
+  "2": [], // Neo
+  "3": [], // Whiskers
+  "4": [], // BuzzBot
+  "5": [], // Detective Smith
+  "6": [], // Savanna
+  "7": []  // Mountain King
+};
+
 export const useImageGeneration = () => {
   const [prompt, setPrompt] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -79,9 +91,19 @@ export const useImageGeneration = () => {
       
       console.log(`Generating image with character: ${character.name}, LoRA: ${character.loraFileId || 'none'}, strength: ${loraStrength}`);
       
+      // Get character-specific trigger words
+      const triggerWords = CHARACTER_TRIGGER_WORDS[character.id] || [];
+      
+      // Append trigger words to the user's prompt if they exist
+      let enhancedPrompt = prompt;
+      if (triggerWords.length > 0) {
+        enhancedPrompt = `${prompt}, ${triggerWords.join(', ')}`.trim();
+        console.log(`Applied hidden trigger words for ${character.name}: ${triggerWords.join(', ')}`);
+      }
+      
       // Prepare generation options
       const generationOptions: ReplicateGenerationOptions = {
-        prompt: prompt,
+        prompt: enhancedPrompt,
         width: 512,
         height: 512,
         steps: 30
