@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -94,8 +93,55 @@ export const useSubscription = () => {
     }
   };
 
+  const addUnlocksToUser = async (userId: string, unlockCount: number) => {
+    try {
+      // Get current unlocks_available count
+      const { data: subscription, error: fetchError } = await supabase
+        .from('subscriptions')
+        .select('unlocks_available')
+        .eq('user_id', userId)
+        .single();
+
+      if (fetchError) throw fetchError;
+      
+      if (!subscription) {
+        toast({
+          title: "Error",
+          description: "User subscription not found",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      // Update with new total
+      const newTotal = subscription.unlocks_available + unlockCount;
+      const { error: updateError } = await supabase
+        .from('subscriptions')
+        .update({ unlocks_available: newTotal })
+        .eq('user_id', userId);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Success",
+        description: `Added ${unlockCount} unlocks to user`,
+      });
+      
+      return true;
+    } catch (error: any) {
+      console.error('Error adding unlocks:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add unlocks",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
   return {
     unlockCharacter,
     updateLastUsed,
+    addUnlocksToUser,
   };
 };
