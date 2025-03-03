@@ -19,10 +19,6 @@ export const useLoraUpload = () => {
       return null;
     }
 
-    // This function is now for internal/development use only
-    // We'll check for admin access, but we've removed the RPC call since we'll manage LoRAs directly in Supabase
-    const { data: user } = await supabase.auth.getUser();
-    
     // Check file extension
     const fileExt = file.name.split(".").pop()?.toLowerCase();
     if (fileExt !== "safetensors") {
@@ -72,6 +68,7 @@ export const useLoraUpload = () => {
       }
 
       // Update the unlocked_characters table with the new LoRA file ID
+      const { data: user } = await supabase.auth.getUser();
       if (user.user) {
         const { error: updateError } = await supabase
           .from("unlocked_characters")

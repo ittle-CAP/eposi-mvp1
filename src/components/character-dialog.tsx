@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CustomButton } from "@/components/ui/custom-button";
 import { UnlockConfirmationDialog } from "@/components/characters/unlock-confirmation-dialog";
+import { LoraUploadDialog } from "@/components/characters/lora-upload-dialog"; 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
 import { Character } from "@/types/character";
@@ -18,6 +19,7 @@ interface CharacterDialogProps {
 
 export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComplete }: CharacterDialogProps) => {
   const [showUnlockConfirmation, setShowUnlockConfirmation] = useState(false);
+  const [showLoraUpload, setShowLoraUpload] = useState(false);
   const navigate = useNavigate();
 
   if (!character) return null;
@@ -36,6 +38,16 @@ export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComp
   const handleGenerateClick = () => {
     onClose();
     navigate(`/generate?character=${character.id}`);
+  };
+
+  const handleLoraUploadClick = () => {
+    setShowLoraUpload(true);
+  };
+
+  const handleLoraUploadComplete = () => {
+    if (onLoraUploadComplete) {
+      onLoraUploadComplete();
+    }
   };
 
   return (
@@ -100,6 +112,17 @@ export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComp
                     >
                       Generate
                     </CustomButton>
+                    
+                    {!character.loraFileId && (
+                      <CustomButton
+                        className="w-full"
+                        variant="outline"
+                        onClick={handleLoraUploadClick}
+                      >
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Add LoRA Enhancement
+                      </CustomButton>
+                    )}
                   </div>
                 )}
 
@@ -123,6 +146,15 @@ export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComp
         onConfirm={handleConfirmUnlock}
         characterName={character.name}
       />
+      
+      {character && (
+        <LoraUploadDialog
+          isOpen={showLoraUpload}
+          onClose={() => setShowLoraUpload(false)}
+          character={character}
+          onUploadComplete={handleLoraUploadComplete}
+        />
+      )}
     </>
   );
 };
