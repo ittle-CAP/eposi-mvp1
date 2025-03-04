@@ -8,7 +8,7 @@ import { useErrorHandler } from "@/utils/error-handling";
 
 // Define trigger words for characters
 const CHARACTER_TRIGGER_WORDS: Record<string, string[]> = {
-  "8": ["headless", "horse rider", "pumpkin"], // The Headless Horseman
+  "8": [], // The Headless Horseman - trigger words removed
   "1": [], // Luna
   "2": [], // Neo
   "3": [], // Whiskers
