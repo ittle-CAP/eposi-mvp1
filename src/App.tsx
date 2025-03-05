@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import Characters from "./pages/Characters";
 import SubscriptionDashboard from "./pages/SubscriptionDashboard";
 import VideoGeneration from "./pages/VideoGeneration";
+import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,11 @@ const App = () => (
             <Route path="/generate" element={
               <ProtectedRoute>
                 <VideoGeneration />
+              </ProtectedRoute>
+            } />
+            <Route path="/analytics" element={
+              <ProtectedRoute>
+                <Analytics />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />

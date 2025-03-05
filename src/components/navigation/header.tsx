@@ -24,6 +24,11 @@ export const Header = () => {
                 Dashboard
               </Link>
             )}
+            {user && (
+              <Link to="/analytics" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+                Analytics
+              </Link>
+            )}
             <Link to="/community" className="text-sm font-medium text-gray-600 hover:text-gray-900">
               Community
             </Link>
