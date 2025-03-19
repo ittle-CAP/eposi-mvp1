@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { CreditCard, LayoutDashboard, Users, UserRound, Home, Users2, Video } from "lucide-react";
+import { CreditCard, LayoutDashboard, Users, UserRound, Home, Users2, Video, BarChart } from "lucide-react";
 import { CustomButton } from "@/components/ui/custom-button";
 import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
@@ -94,6 +94,12 @@ export const UserNav = () => {
                 <Link to="/subscription" className="flex w-full cursor-pointer items-center">
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   <span>Dashboard</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/analytics" className="flex w-full cursor-pointer items-center">
+                  <BarChart className="mr-2 h-4 w-4" />
+                  <span>Analytics</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
