@@ -6,9 +6,15 @@ import { ImageGenerationForm } from "@/components/generation/ImageGenerationForm
 import { GenerationLayout } from "@/components/generation/GenerationLayout";
 import { useVideoGeneration } from "@/hooks/use-video-generation";
 import { useImageGeneration } from "@/hooks/use-image-generation";
+import { useCharacters } from "@/hooks/use-characters";
+import { useAuth } from "@/components/AuthProvider";
+import { isAdmin } from "@/utils/permissions";
 
 const VideoGeneration = () => {
   const [searchParams] = useSearchParams();
+  const { user } = useAuth();
+  const { characters } = useCharacters();
+  
   const {
     selectedCharacter: videoSelectedCharacter,
     setSelectedCharacter: setVideoSelectedCharacter,

@@ -7,6 +7,9 @@ import { Slider } from "@/components/ui/slider";
 import { useState, useEffect } from "react";
 import { useReplicateGeneration } from "@/hooks/use-replicate-generation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from "@/components/AuthProvider";
+import { isAdmin } from "@/utils/permissions";
+import { useCharacters } from "@/hooks/use-characters";
 
 interface ImageGenerationFormProps {
   selectedCharacter: string;
@@ -39,6 +42,9 @@ export const ImageGenerationForm = ({
 }: ImageGenerationFormProps) => {
   const [sliderValue, setSliderValue] = useState([loraStrength]);
   const [error, setError] = useState<string | null>(null);
+  const [isUserAdmin, setIsUserAdmin] = useState(false);
+  const { user } = useAuth();
+  const { characters } = useCharacters();
   
   const { 
     isGenerating: localIsGenerating, 
@@ -46,6 +52,18 @@ export const ImageGenerationForm = ({
     generateImage,
     generationError,
   } = useReplicateGeneration();
+  
+  // Check if user is admin
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (user) {
+        const adminStatus = await isAdmin(user.id);
+        setIsUserAdmin(adminStatus);
+      }
+    };
+    
+    checkAdminStatus();
+  }, [user]);
   
   // Track errors from the Replicate generation hook
   useEffect(() => {
@@ -63,7 +81,9 @@ export const ImageGenerationForm = ({
     }
   };
 
-  const selectedCharacterData = unlockedCharacters.find(char => char.id === selectedCharacter);
+  // Determine which characters to display in the dropdown
+  const displayCharacters = isUserAdmin ? characters : unlockedCharacters;
+  const selectedCharacterData = displayCharacters.find(char => char.id === selectedCharacter);
 
   const handleReplicateGenerate = () => {
     setError(null);
@@ -95,7 +115,7 @@ export const ImageGenerationForm = ({
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              {unlockedCharacters.map((character) => (
+              {displayCharacters.map((character) => (
                 <SelectItem key={character.id} value={character.id}>
                   <div className="flex items-center gap-2">
                     <img
