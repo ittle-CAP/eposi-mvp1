@@ -1,57 +1,47 @@
 
-import { useMemo } from "react";
+import { useCharacters } from "./use-characters";
 
 /**
- * Hook for accessing character data
+ * Hook for retrieving and managing character data
  */
 export const useCharacterData = () => {
-  const allCharactersData = useMemo(() => ({
-    "8": {
-      name: "The Headless Horseman",
-      genre: "Horror"
-    },
-    "1": {
-      name: "Luna",
-      genre: "Fantasy"
-    },
-    "2": {
-      name: "Neo",
-      genre: "Sci-fi"
-    },
-    "7": {
-      name: "Mountain King",
-      genre: "Fantasy"
-    },
-    "11": {
-      name: "Among Us",
-      genre: "Gaming"
-    },
-    "12": {
-      name: "Fall Guys",
-      genre: "Gaming"
-    },
-    "13": {
-      name: "Minecraft",
-      genre: "Style"
-    }
-  }), []);
+  const { characters } = useCharacters();
   
+  /**
+   * Get character info by ID from either unlocked or all characters
+   */
   const getCharacterInfoById = (
     characterId: string, 
-    availableCharacters: Array<any>
+    characterList: any[]
   ) => {
-    return availableCharacters.find(char => char.id === characterId);
-  };
-  
-  const getCharacterNameById = (characterId: string | null) => {
-    if (!characterId) return "Unknown Character";
+    if (!characterId || !characterList || characterList.length === 0) {
+      console.log("No character ID or character list provided");
+      return null;
+    }
     
-    return allCharactersData[characterId as keyof typeof allCharactersData]?.name || "Unknown Character";
+    const characterInfo = characterList.find(char => char.id === characterId);
+    
+    if (!characterInfo) {
+      console.log(`Character with ID ${characterId} not found in the provided list`);
+      return null;
+    }
+    
+    console.log(`Found character info for ID ${characterId}:`, characterInfo);
+    return characterInfo;
   };
-  
+
+  /**
+   * Check if character has a LoRA file associated with it
+   */
+  const hasCharacterLora = (characterId: string) => {
+    const character = characters.find(char => char.id === characterId);
+    const hasLora = character && character.loraFileId && character.loraFileUrl;
+    console.log(`Character ${characterId} has LoRA: ${hasLora}`);
+    return hasLora;
+  };
+
   return {
-    allCharactersData,
     getCharacterInfoById,
-    getCharacterNameById
+    hasCharacterLora
   };
 };

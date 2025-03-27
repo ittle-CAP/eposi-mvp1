@@ -17,10 +17,18 @@ export const useGenerationOptions = () => {
       steps: 30
     };
     
-    if (characterInfo && 'loraFileId' in characterInfo && characterInfo.loraFileId) {
-      if ('loraFileUrl' in characterInfo && characterInfo.loraFileUrl) {
+    // Properly check for LoRA information
+    if (characterInfo) {
+      // Log character info to help with debugging
+      console.log("Character info for generation:", characterInfo);
+      
+      if ('loraFileId' in characterInfo && characterInfo.loraFileId && 
+          'loraFileUrl' in characterInfo && characterInfo.loraFileUrl) {
+        console.log(`Setting LoRA URL: ${characterInfo.loraFileUrl} with strength: ${loraStrength}`);
         generationOptions.loraUrl = characterInfo.loraFileUrl;
         generationOptions.loraStrength = loraStrength;
+      } else {
+        console.log("Character does not have valid LoRA information");
       }
     }
     

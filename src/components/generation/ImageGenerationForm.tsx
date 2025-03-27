@@ -10,6 +10,7 @@ import { PromptInput } from "./components/PromptInput";
 import { CharacterStrengthSlider } from "./components/CharacterStrengthSlider";
 import { GenerationControls } from "./components/GenerationControls";
 import { ImagePreview } from "./components/ImagePreview";
+import { useCharacterData } from "@/hooks/use-character-data";
 
 interface ImageGenerationFormProps {
   selectedCharacter: string;
@@ -44,6 +45,7 @@ export const ImageGenerationForm = ({
   const [isUserAdmin, setIsUserAdmin] = useState(false);
   const { user } = useAuth();
   const { characters } = useCharacters();
+  const { hasCharacterLora } = useCharacterData();
   
   const { 
     generationError,
@@ -73,6 +75,15 @@ export const ImageGenerationForm = ({
   // Determine which characters to display in the dropdown
   const displayCharacters = isUserAdmin ? characters : unlockedCharacters;
   const selectedCharacterData = displayCharacters.find(char => char.id === selectedCharacter);
+  
+  // Check if the character has LoRA capability
+  const hasLora = selectedCharacter ? 
+    (selectedCharacterData?.loraFileId && selectedCharacterData?.loraFileUrl) : false;
+  
+  console.log(`Selected character: ${selectedCharacter}, Has LoRA: ${hasLora}`);
+  if (selectedCharacterData) {
+    console.log("Character data:", selectedCharacterData);
+  }
 
   const handleReplicateGenerate = () => {
     setError(null);
@@ -102,7 +113,7 @@ export const ImageGenerationForm = ({
         setPrompt={setPrompt}
       />
 
-      {selectedCharacterData?.loraFileId && setLoraStrength && (
+      {hasLora && setLoraStrength && (
         <CharacterStrengthSlider 
           loraStrength={loraStrength}
           setLoraStrength={setLoraStrength}
