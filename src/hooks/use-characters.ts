@@ -16,6 +16,7 @@ export const useCharacters = () => {
       return;
     }
 
+    console.log('Unlocked characters data:', data);
     setUnlockedCharacterIds(data.map(char => char.character_id));
     
     const loraMap: Record<string, any> = {};
@@ -28,12 +29,15 @@ export const useCharacters = () => {
       }
     });
     setCharacterLoras(loraMap);
+    console.log('Character LoRAs after mapping:', loraMap);
   };
 
   const fetchLoraDetails = async () => {
     const loraFileIds = Object.values(characterLoras).map(lora => lora.loraFileId).filter(Boolean);
     
     if (loraFileIds.length === 0) return;
+    
+    console.log('Fetching LoRA details for IDs:', loraFileIds);
     
     const { data, error } = await supabase
       .from('character_loras')
@@ -45,16 +49,20 @@ export const useCharacters = () => {
       return;
     }
     
+    console.log('LoRA details from database:', data);
+    
     const updatedLoras = { ...characterLoras };
     data.forEach(lora => {
       Object.keys(characterLoras).forEach(charId => {
         if (characterLoras[charId].loraFileId === lora.id) {
           updatedLoras[charId].loraFileUrl = lora.file_url;
+          console.log(`Set LoRA URL for character ${charId}:`, lora.file_url);
         }
       });
     });
     
     setCharacterLoras(updatedLoras);
+    console.log('Updated character LoRAs with URLs:', updatedLoras);
   };
 
   useEffect(() => {
@@ -158,7 +166,16 @@ export const useCharacters = () => {
       unlocks: 1654,
       ...(characterLoras["13"] || {})
     }
-  ];
+  ].map(character => {
+    if (characterLoras[character.id]) {
+      console.log(`Merging LoRA data for ${character.name}:`, characterLoras[character.id]);
+      return {
+        ...character,
+        ...characterLoras[character.id]
+      };
+    }
+    return character;
+  });
 
   return {
     characters,

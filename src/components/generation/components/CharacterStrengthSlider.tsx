@@ -13,6 +13,8 @@ export const CharacterStrengthSlider = ({
 }: CharacterStrengthSliderProps) => {
   const [sliderValue, setSliderValue] = useState([loraStrength]);
 
+  console.log("Rendering CharacterStrengthSlider with strength:", loraStrength);
+
   // Update slider when loraStrength changes from parent
   useEffect(() => {
     setSliderValue([loraStrength]);

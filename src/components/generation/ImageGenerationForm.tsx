@@ -45,7 +45,6 @@ export const ImageGenerationForm = ({
   const [isUserAdmin, setIsUserAdmin] = useState(false);
   const { user } = useAuth();
   const { characters } = useCharacters();
-  const { hasCharacterLora } = useCharacterData();
   
   const { 
     generationError,
@@ -86,7 +85,9 @@ export const ImageGenerationForm = ({
      selectedCharacterData.loraFileUrl.length > 0) : false;
   
   // Log detailed information for debugging
-  console.log(`Selected character: ${selectedCharacter}, Has LoRA: ${hasLora}`);
+  console.log(`Selected character: ${selectedCharacter}, Has LoRA:`, hasLora);
+  console.log(`LoRA fields - ID: ${selectedCharacterData?.loraFileId || 'none'}, URL: ${selectedCharacterData?.loraFileUrl || 'none'}`);
+  
   if (selectedCharacterData) {
     console.log("Character data:", JSON.stringify(selectedCharacterData, null, 2));
   }
