@@ -1,9 +1,8 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { ReplicateGenerationOptions, ReplicateResponse } from "@/types/replicate";
 
 export const startImageGeneration = async (options: ReplicateGenerationOptions): Promise<ReplicateResponse> => {
-  console.log("Starting image generation with Replicate:", options);
+  console.log("Starting image generation with Replicate:", JSON.stringify(options, null, 2));
   
   // Use sensible defaults for any missing options
   const body: Record<string, any> = {
@@ -26,10 +25,15 @@ export const startImageGeneration = async (options: ReplicateGenerationOptions):
   }
   
   // Only include LoRA options if a LoRA URL is provided
-  if (options.loraUrl) {
+  if (options.loraUrl && options.loraUrl.trim() !== "") {
+    // Ensure we're using the exact parameter names expected by the Replicate API
     body.loraUrl = options.loraUrl;
-    body.loraStrength = options.loraStrength || 0.7;
-    console.log(`Using LoRA with URL: ${options.loraUrl} and strength: ${options.loraStrength || 0.7}`);
+    
+    // Make sure strength is a number and has a valid value
+    const strength = Number(options.loraStrength);
+    body.loraStrength = !isNaN(strength) ? strength : 0.7;
+    
+    console.log(`Using LoRA with URL: ${body.loraUrl} and strength: ${body.loraStrength}`);
   } else {
     console.log("No LoRA specified, using base model");
     // Explicitly set empty LoRA parameters to ensure clean generation
@@ -38,7 +42,7 @@ export const startImageGeneration = async (options: ReplicateGenerationOptions):
   }
   
   try {
-    console.log("Invoking replicate-image function with body:", body);
+    console.log("Invoking replicate-image function with body:", JSON.stringify(body, null, 2));
     const { data, error } = await supabase.functions.invoke("replicate-image", {
       body: body
     });

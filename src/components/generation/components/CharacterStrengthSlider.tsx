@@ -22,9 +22,10 @@ export const CharacterStrengthSlider = ({
   }, [loraStrength]);
 
   const handleSliderChange = (value: number[]) => {
+    const newStrength = value[0];
     setSliderValue(value);
-    setLoraStrength(value[0]);
-    console.log(`LoRA strength updated to: ${value[0]}`);
+    setLoraStrength(newStrength);
+    console.log(`LoRA strength updated to: ${newStrength}`);
   };
 
   return (

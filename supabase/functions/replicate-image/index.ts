@@ -47,7 +47,7 @@ serve(async (req) => {
 });
 
 async function createPrediction(options: any) {
-  console.log('Starting prediction with options:', JSON.stringify(options));
+  console.log('Starting prediction with options:', JSON.stringify(options, null, 2));
 
   // Set defaults and validate inputs
   const prompt = options.prompt;
@@ -61,7 +61,7 @@ async function createPrediction(options: any) {
     });
   }
 
-  // Base model to use
+  // Base model to use (using the LoRA-enabled model)
   const model = "black-forest-labs/flux-dev-lora";
   
   // Build API request body
@@ -84,14 +84,26 @@ async function createPrediction(options: any) {
     replicateBody.input.seed = options.seed;
   }
 
-  // Add LoRA settings if provided
+  // Add LoRA settings if provided - ensure case matches exactly what the API expects
   if (options.loraUrl && options.loraUrl.trim() !== "") {
-    console.log(`Using LoRA URL: ${options.loraUrl}`);
+    console.log(`Using LoRA with URL: ${options.loraUrl} and strength: ${options.loraStrength || 0.7}`);
+    
+    // Map to exact parameter names expected by Replicate for this model
     replicateBody.input.lora_url = options.loraUrl;
-    replicateBody.input.lora_scale = options.loraStrength || 0.7;
+    
+    // Ensure strength is a valid number
+    const strength = Number(options.loraStrength);
+    replicateBody.input.lora_scale = !isNaN(strength) ? strength : 0.7;
+    
+    console.log("Added LoRA parameters:", {
+      lora_url: replicateBody.input.lora_url,
+      lora_scale: replicateBody.input.lora_scale
+    });
+  } else {
+    console.log("No LoRA specified, using base model");
   }
 
-  console.log('Final Replicate API request:', JSON.stringify(replicateBody));
+  console.log('Final Replicate API request:', JSON.stringify(replicateBody, null, 2));
 
   // Call the Replicate API
   try {
