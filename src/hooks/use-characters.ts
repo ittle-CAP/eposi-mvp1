@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Character } from "@/types/character";
@@ -123,7 +122,7 @@ export const useCharacters = () => {
       id: "12",
       name: "Fall Guys",
       genre: "Gaming",
-      imageUrl: "https://images.unsplash.com/photo-1498936178812-4b2e558d2937", // Placeholder
+      imageUrl: "/lovable-uploads/6f604d07-68c5-475c-9f6a-516962cb65b4.png", // Updated to use the uploaded Fall Guys image
       isLocked: !unlockedCharacterIds.includes("12"),
       description: "An adorable, wobbly bean contestant from the hit battle royale game. With a jelly-like body and customizable outfits, this character tumbles and bumbles through chaotic obstacle courses.",
       unlocks: 1426,
