@@ -35,8 +35,16 @@ export const useCharacterData = () => {
    */
   const hasCharacterLora = (characterId: string) => {
     const character = characters.find(char => char.id === characterId);
-    const hasLora = character && character.loraFileId && character.loraFileUrl;
-    console.log(`Character ${characterId} has LoRA: ${hasLora}`);
+    // More robust check for LoRA data - must have both an ID and URL
+    const hasLora = character && 
+                   character.loraFileId && 
+                   character.loraFileUrl && 
+                   character.loraFileId.length > 0 && 
+                   character.loraFileUrl.length > 0;
+    
+    console.log(`Character ${characterId} has LoRA:`, hasLora, 
+                `LoRA ID: ${character?.loraFileId || 'none'}`, 
+                `LoRA URL: ${character?.loraFileUrl || 'none'}`);
     return hasLora;
   };
 

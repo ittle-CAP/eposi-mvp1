@@ -74,15 +74,21 @@ export const ImageGenerationForm = ({
 
   // Determine which characters to display in the dropdown
   const displayCharacters = isUserAdmin ? characters : unlockedCharacters;
+  
+  // Get the selected character data
   const selectedCharacterData = displayCharacters.find(char => char.id === selectedCharacter);
   
-  // Check if the character has LoRA capability
-  const hasLora = selectedCharacter ? 
-    (selectedCharacterData?.loraFileId && selectedCharacterData?.loraFileUrl) : false;
+  // Explicitly check if the character has a complete LoRA configuration
+  const hasLora = selectedCharacter && selectedCharacterData ? 
+    (selectedCharacterData.loraFileId && 
+     selectedCharacterData.loraFileUrl && 
+     selectedCharacterData.loraFileId.length > 0 && 
+     selectedCharacterData.loraFileUrl.length > 0) : false;
   
+  // Log detailed information for debugging
   console.log(`Selected character: ${selectedCharacter}, Has LoRA: ${hasLora}`);
   if (selectedCharacterData) {
-    console.log("Character data:", selectedCharacterData);
+    console.log("Character data:", JSON.stringify(selectedCharacterData, null, 2));
   }
 
   const handleReplicateGenerate = () => {
