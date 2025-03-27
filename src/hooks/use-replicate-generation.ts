@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { 
   startImageGeneration, 
@@ -7,7 +8,7 @@ import {
 import { ReplicateGenerationOptions } from "@/types/replicate";
 import { useErrorHandler } from "@/utils/error-handling";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/services/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useReplicateGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false);

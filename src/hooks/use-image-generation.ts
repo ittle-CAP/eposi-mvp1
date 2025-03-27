@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useCharacterManagement } from "./use-character-management";
@@ -8,15 +7,14 @@ import { useErrorHandler } from "@/utils/error-handling";
 import { isAdmin } from "@/utils/permissions";
 import { useAuth } from "@/components/AuthProvider";
 
-// Define trigger words for characters
 const CHARACTER_TRIGGER_WORDS: Record<string, string[]> = {
-  "8": ["zavy-hdlsshrsmn"], // The Headless Horseman
-  "1": [], // Luna
-  "2": [], // Neo
-  "7": [], // Mountain King
-  "11": ["mikus-style"], // Among Us
-  "12": ["fallguys character"], // Fall Guys
-  "13": ["minecraft filter"] // Minecraft Style
+  "8": ["zavy-hdlsshrsmn"],
+  "1": [],
+  "2": [],
+  "7": [],
+  "11": ["mikus-style"],
+  "12": ["fallguys character"],
+  "13": ["minecraft filter"]
 };
 
 export const useImageGeneration = () => {
@@ -47,12 +45,10 @@ export const useImageGeneration = () => {
     cancelGeneration,
   } = useReplicateGeneration();
 
-  // Ensure the characters are loaded
   useEffect(() => {
     fetchUnlockedCharacters();
   }, []);
 
-  // Automatically select the first character if none is selected and characters are available
   useEffect(() => {
     if (!selectedCharacter && unlockedCharacters.length > 0) {
       console.log("Auto-selecting first character:", unlockedCharacters[0].id);
@@ -60,7 +56,6 @@ export const useImageGeneration = () => {
     }
   }, [selectedCharacter, unlockedCharacters, setSelectedCharacter]);
 
-  // Track error state from Replicate
   useEffect(() => {
     if (replicateGenerationError) {
       setGenerationError(replicateGenerationError);
@@ -72,21 +67,17 @@ export const useImageGeneration = () => {
   const handleImageGenerate = async () => {
     setGenerationError("");
     try {
-      // Check if the user is admin
       let userIsAdmin = false;
       if (user) {
         userIsAdmin = await isAdmin(user.id);
       }
 
-      // For admin users, we'll bypass character unlock checks
       if (!userIsAdmin) {
-        // Check if we have any unlocked characters first
         if (unlockedCharacters.length === 0) {
           console.log("No unlocked characters available");
           throw new Error("No characters available. Please unlock a character first.");
         }
 
-        // Check if a character is selected
         if (!selectedCharacter) {
           console.log("No character selected");
           throw new Error("Please select a character first");
@@ -99,55 +90,51 @@ export const useImageGeneration = () => {
           throw new Error("Character not found. Please select a different character.");
         }
       }
-      
-      // Get the selected character - for admins, this might be a character they haven't unlocked yet
+
       const allCharactersData = {
         "8": {
           name: "The Headless Horseman",
-          genre: "Horror",
+          genre: "Horror"
         },
         "1": {
           name: "Luna",
-          genre: "Fantasy",
+          genre: "Fantasy"
         },
         "2": {
           name: "Neo",
-          genre: "Sci-fi",
+          genre: "Sci-fi"
         },
         "7": {
           name: "Mountain King",
-          genre: "Fantasy",
+          genre: "Fantasy"
         },
         "11": {
           name: "Among Us",
-          genre: "Gaming",
+          genre: "Gaming"
         },
         "12": {
           name: "Fall Guys",
-          genre: "Gaming",
+          genre: "Gaming"
         },
         "13": {
           name: "Minecraft",
-          genre: "Style",
+          genre: "Style"
         }
       };
-      
+
       const selectedCharInfo = unlockedCharacters.find(char => char.id === selectedCharacter) || 
         { id: selectedCharacter, name: allCharactersData[selectedCharacter as keyof typeof allCharactersData]?.name || "Unknown Character" };
       
       console.log(`Generating image with character: ${selectedCharInfo.name}, strength: ${loraStrength}`);
       
-      // Get character-specific trigger words
       const triggerWords = CHARACTER_TRIGGER_WORDS[selectedCharacter] || [];
       
-      // Append trigger words to the user's prompt if they exist
       let enhancedPrompt = prompt;
       if (triggerWords.length > 0) {
         enhancedPrompt = `${prompt}, ${triggerWords.join(', ')}`.trim();
         console.log(`Applied hidden trigger words for ${selectedCharInfo.name}: ${triggerWords.join(', ')}`);
       }
       
-      // Prepare generation options
       const generationOptions: ReplicateGenerationOptions = {
         prompt: enhancedPrompt,
         width: 512,
@@ -155,18 +142,16 @@ export const useImageGeneration = () => {
         steps: 30
       };
       
-      // Only add LoRA options if the character has a LoRA file
-      if (selectedCharInfo.loraFileUrl) {
-        generationOptions.loraUrl = selectedCharInfo.loraFileUrl;
-        generationOptions.loraStrength = loraStrength;
+      if ('loraFileId' in selectedCharInfo && selectedCharInfo.loraFileId) {
+        if ('loraFileUrl' in selectedCharInfo && selectedCharInfo.loraFileUrl) {
+          generationOptions.loraUrl = selectedCharInfo.loraFileUrl;
+          generationOptions.loraStrength = loraStrength;
+        }
       }
       
-      // Start the generation process with Replicate
-      // Admin users will bypass credit checks in the Replicate hook
       const success = await replicateGenerateImage(generationOptions, userIsAdmin);
       
       if (success && selectedCharacter) {
-        // The image URL will be updated by the useReplicateGeneration hook
         updateCharacterLastUsed(selectedCharacter);
       }
     } catch (error) {
@@ -176,7 +161,6 @@ export const useImageGeneration = () => {
     }
   };
 
-  // Sync the isGenerating state with the Replicate generation status
   useEffect(() => {
     if (!isGenerating && replicateIsGenerating) {
       setIsGenerating(true);
@@ -185,7 +169,6 @@ export const useImageGeneration = () => {
     }
   }, [replicateIsGenerating, generationStatus, isGenerating]);
 
-  // Use the generated image URL from the Replicate hook
   useEffect(() => {
     if (replicateGeneratedImageUrl && replicateGeneratedImageUrl !== generatedImageUrl) {
       setGeneratedImageUrl(replicateGeneratedImageUrl);
