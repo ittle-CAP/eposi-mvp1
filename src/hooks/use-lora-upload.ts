@@ -34,6 +34,19 @@ export const useLoraUpload = () => {
       setIsUploading(true);
       setUploadProgress(0);
 
+      // Get the current session for authentication
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData.session;
+
+      if (!session) {
+        toast({
+          title: "Authentication Error",
+          description: "You must be logged in to upload LoRA files",
+          variant: "destructive",
+        });
+        return null;
+      }
+
       // Create form data
       const formData = new FormData();
       formData.append("file", file);
@@ -49,9 +62,12 @@ export const useLoraUpload = () => {
         });
       }, 500);
 
-      // Call the edge function to upload the file
+      // Call the edge function to upload the file with auth token
       const { data, error } = await supabase.functions.invoke("upload-lora", {
         body: formData,
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
       });
 
       clearInterval(progressInterval);

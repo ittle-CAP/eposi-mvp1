@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CustomButton } from "@/components/ui/custom-button";
 import { UnlockConfirmationDialog } from "@/components/characters/unlock-confirmation-dialog";
@@ -9,6 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { Character } from "@/types/character";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles } from "lucide-react";
+import { useAuth } from "@/components/AuthProvider";
+import { isAdmin } from "@/utils/permissions";
 
 interface CharacterDialogProps {
   character: Character | null;
@@ -20,7 +22,22 @@ interface CharacterDialogProps {
 export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComplete }: CharacterDialogProps) => {
   const [showUnlockConfirmation, setShowUnlockConfirmation] = useState(false);
   const [showLoraUpload, setShowLoraUpload] = useState(false);
+  const [userIsAdmin, setUserIsAdmin] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (user) {
+        const adminStatus = await isAdmin(user.id);
+        setUserIsAdmin(adminStatus);
+      } else {
+        setUserIsAdmin(false);
+      }
+    };
+    
+    checkAdminStatus();
+  }, [user]);
 
   if (!character) return null;
 
@@ -113,7 +130,7 @@ export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComp
                       Generate
                     </CustomButton>
                     
-                    {!character.loraFileId && (
+                    {!character.loraFileId && userIsAdmin && (
                       <CustomButton
                         className="w-full"
                         variant="outline"
