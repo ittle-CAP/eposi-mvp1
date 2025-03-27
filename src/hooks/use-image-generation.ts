@@ -10,10 +10,6 @@ const CHARACTER_TRIGGER_WORDS: Record<string, string[]> = {
   "8": ["zavy-hdlsshrsmn"], // The Headless Horseman
   "1": [], // Luna
   "2": [], // Neo
-  "3": [], // Whiskers
-  "4": [], // BuzzBot
-  "5": [], // Detective Smith
-  "6": [], // Savanna
   "7": [], // Mountain King
   "11": ["mikus-style"], // Among Us
   "12": ["fallguys character"], // Fall Guys

@@ -54,8 +54,8 @@ const Characters = () => {
         <div className="mb-8">
           <h1 className="mb-4 text-3xl font-bold">Characters & Styles</h1>
           <p className="text-gray-600">
-            Choose from our collection of AI characters and style presets to create unique videos and images.
-            Unlock characters and styles using your subscription unlocks.
+            Choose from our curated collection of AI characters and visual styles to create unique images and videos.
+            Unlock your favorites using your subscription credits.
           </p>
         </div>
 

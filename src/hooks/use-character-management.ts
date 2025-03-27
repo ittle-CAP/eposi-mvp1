@@ -45,30 +45,6 @@ export const useCharacterManagement = () => {
           imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
           description: "A digital warrior fighting against the machine world.",
         },
-        "3": {
-          name: "Whiskers",
-          genre: "Anime",
-          imageUrl: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-          description: "A magical cat with nine lives and the ability to speak to humans.",
-        },
-        "4": {
-          name: "BuzzBot",
-          genre: "Gaming",
-          imageUrl: "https://images.unsplash.com/photo-1498936178812-4b2e558d2937",
-          description: "A quirky robot character from the hit game 'Digital Dreams'.",
-        },
-        "5": {
-          name: "Detective Smith",
-          genre: "Television",
-          imageUrl: "https://images.unsplash.com/photo-1721322800607-8c38375eef04",
-          description: "A brilliant detective with an uncanny ability to solve impossible cases.",
-        },
-        "6": {
-          name: "Savanna",
-          genre: "Film",
-          imageUrl: "https://images.unsplash.com/photo-1466721591366-2d5fba72006d",
-          description: "A wildlife conservationist who can communicate with animals.",
-        },
         "7": {
           name: "Mountain King",
           genre: "Fantasy",
