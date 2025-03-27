@@ -8,6 +8,8 @@ import { useSubscription } from "@/hooks/use-subscription";
 import { SearchFilter } from "@/components/characters/search-filter";
 import { useCharacterFilter } from "@/hooks/use-character-filter";
 import { Header } from "@/components/navigation/header";
+import { isAdmin } from "@/utils/permissions";
+import { useAuth } from "@/components/AuthProvider";
 
 const Characters = () => {
   const { characters, unlockedCharacterIds, fetchUnlockedCharacters } = useCharacters();
@@ -21,10 +23,40 @@ const Characters = () => {
     filteredCharacters,
     genres 
   } = useCharacterFilter(characters);
+  const { user } = useAuth();
+  const [userIsAdmin, setUserIsAdmin] = useState(false);
+  const [processedCharacters, setProcessedCharacters] = useState<Character[]>([]);
 
   useEffect(() => {
     document.title = "Characters & Styles | AI Video Generator";
   }, []);
+
+  // Check if user is admin
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (user) {
+        const adminStatus = await isAdmin(user.id);
+        setUserIsAdmin(adminStatus);
+      }
+    };
+    
+    checkAdminStatus();
+  }, [user]);
+
+  // Process characters based on admin status
+  useEffect(() => {
+    let processed = [...filteredCharacters];
+    
+    // If user is admin, mark all characters as unlocked in the UI
+    if (userIsAdmin) {
+      processed = processed.map(character => ({
+        ...character,
+        isLocked: false
+      }));
+    }
+    
+    setProcessedCharacters(processed);
+  }, [filteredCharacters, userIsAdmin]);
 
   const handleSelectCharacter = (character: Character) => {
     setSelectedCharacter(character);
@@ -55,7 +87,8 @@ const Characters = () => {
           <h1 className="mb-4 text-3xl font-bold">Characters & Styles</h1>
           <p className="text-gray-600">
             Choose from our curated collection of AI characters and visual styles to create unique images and videos.
-            Unlock your favorites using your subscription credits.
+            {!userIsAdmin && "Unlock your favorites using your subscription credits."}
+            {userIsAdmin && "As an admin, you have access to all characters."}
           </p>
         </div>
 
@@ -68,8 +101,8 @@ const Characters = () => {
         />
 
         <CharacterGrid
-          characters={filteredCharacters}
-          unlockedCharacterIds={unlockedCharacterIds}
+          characters={processedCharacters}
+          unlockedCharacterIds={userIsAdmin ? processedCharacters.map(c => c.id) : unlockedCharacterIds}
           onSelectCharacter={handleSelectCharacter}
           onUnlock={handleUnlockCharacter}
         />

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   startImageGeneration, 
@@ -8,6 +7,7 @@ import {
 import { ReplicateGenerationOptions } from "@/types/replicate";
 import { useErrorHandler } from "@/utils/error-handling";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/services/supabase";
 
 export const useReplicateGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -19,7 +19,6 @@ export const useReplicateGeneration = () => {
   const { handleApiError, handleGenerationError } = useErrorHandler();
 
   const pollGenerationStatus = async (id: string) => {
-    // If we don't have a prediction ID, we can't check status
     if (!id) return;
     
     try {
@@ -28,13 +27,11 @@ export const useReplicateGeneration = () => {
       console.log("Prediction status:", prediction.status, prediction);
       setGenerationStatus(prediction.status);
       
-      // If it's still processing, poll again in a moment
       if (prediction.status === "processing") {
         setTimeout(() => pollGenerationStatus(id), 1500);
         return;
       }
       
-      // If it succeeded, set the image URL
       if (prediction.status === "succeeded" && prediction.output && prediction.output.length > 0) {
         console.log("Generated image URL:", prediction.output[0]);
         setGeneratedImageUrl(prediction.output[0]);
@@ -44,14 +41,12 @@ export const useReplicateGeneration = () => {
         });
       }
       
-      // If it failed, show an error
       if (prediction.status === "failed" || prediction.error) {
         const errorMsg = prediction.error || "Unknown generation error";
         setGenerationError(errorMsg);
         handleGenerationError(errorMsg, "Image");
       }
       
-      // Regardless of outcome, we're no longer generating
       setIsGenerating(false);
     } catch (error) {
       console.error("Error in pollGenerationStatus:", error);
@@ -62,24 +57,75 @@ export const useReplicateGeneration = () => {
     }
   };
 
-  const generateImage = async (options: ReplicateGenerationOptions): Promise<boolean> => {
-    setIsGenerating(true);
-    setGenerationStatus("starting");
-    setGeneratedImageUrl("");
-    setGenerationError("");
-    
+  const generateImage = async (options: ReplicateGenerationOptions, isAdmin: boolean = false) => {
+    if (isGenerating) {
+      console.log("Generation already in progress");
+      return false;
+    }
+
     try {
-      // Ensure we have a good negative prompt by default
+      setIsGenerating(true);
+      setGenerationStatus("starting");
+      setGeneratedImageUrl("");
+      setGenerationError("");
+      
+      const { data: user } = await supabase.auth.getUser();
+      if (!user || !user.user) {
+        setGenerationError("User not authenticated");
+        setIsGenerating(false);
+        return false;
+      }
+
+      if (!isAdmin) {
+        const { data: subscription, error: subscriptionError } = await supabase
+          .from('subscriptions')
+          .select('credits_available')
+          .eq('user_id', user.user.id)
+          .single();
+
+        if (subscriptionError) {
+          console.error("Error fetching subscription:", subscriptionError);
+          setGenerationError("Error checking credits");
+          setIsGenerating(false);
+          return false;
+        }
+
+        if (!subscription || subscription.credits_available < 1) {
+          setGenerationError("Not enough credits");
+          setIsGenerating(false);
+          toast({
+            title: "Not enough credits",
+            description: "Please purchase more credits to generate images",
+            variant: "destructive",
+          });
+          return false;
+        }
+
+        const { error: updateError } = await supabase
+          .from('subscriptions')
+          .update({
+            credits_available: subscription.credits_available - 1
+          })
+          .eq('user_id', user.user.id);
+
+        if (updateError) {
+          console.error("Error updating credits:", updateError);
+          setGenerationError("Error updating credits");
+          setIsGenerating(false);
+          return false;
+        }
+      } else {
+        console.log("Admin user - bypassing credit check for image generation");
+      }
+
       if (!options.negativePrompt) {
         options.negativePrompt = "ugly, blurry, low quality, distorted, disfigured";
       }
       
-      // Ensure we have a reasonable number of steps for good quality
       if (!options.steps || options.steps < 20) {
         options.steps = 30;
       }
       
-      // Add a random seed if none provided for reproducibility
       if (!options.seed) {
         options.seed = Math.floor(Math.random() * 2147483647);
       }
@@ -89,11 +135,9 @@ export const useReplicateGeneration = () => {
 
       console.log("Received generation response:", response);
       
-      // Store the prediction ID for status checks
       setPredictionId(response.id);
       setGenerationStatus("processing");
       
-      // Poll for results
       await pollGenerationStatus(response.id);
       return true;
     } catch (error) {
@@ -121,7 +165,6 @@ export const useReplicateGeneration = () => {
     } catch (error) {
       console.error("Error canceling generation:", error);
       setGenerationError(error instanceof Error ? error.message : String(error));
-      // Even if the cancellation fails, update the UI
       setIsGenerating(false);
       setGenerationStatus("canceled");
     }

@@ -67,6 +67,9 @@ export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComp
     }
   };
 
+  // Admin users can access all characters regardless of locked status
+  const effectivelyUnlocked = !character.isLocked || userIsAdmin;
+
   return (
     <>
       <Dialog open={!!character} onOpenChange={onClose}>
@@ -74,9 +77,14 @@ export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComp
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {character.name}
-              {!character.isLocked && character.loraFileId && (
+              {effectivelyUnlocked && character.loraFileId && (
                 <Badge variant="outline" className="ml-2 bg-[#553D8A]/10 text-[#553D8A] border-[#553D8A]/20">
                   LoRA Enabled
+                </Badge>
+              )}
+              {userIsAdmin && character.isLocked && (
+                <Badge variant="outline" className="ml-2 bg-amber-100 text-amber-800 border-amber-200">
+                  Admin Access
                 </Badge>
               )}
             </DialogTitle>
@@ -87,7 +95,7 @@ export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComp
               <img
                 src={character.imageUrl}
                 alt={character.name}
-                className={`w-full rounded-lg object-cover ${character.isLocked ? 'opacity-50' : ''}`}
+                className={`w-full rounded-lg object-cover ${character.isLocked && !userIsAdmin ? 'opacity-50' : ''}`}
               />
 
               <div className="space-y-4">
@@ -100,7 +108,7 @@ export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComp
                   </span>
                 </div>
 
-                {!character.isLocked && character.loraFileId && (
+                {effectivelyUnlocked && character.loraFileId && (
                   <div className="rounded-lg bg-[#553D8A]/5 p-3 border border-[#553D8A]/10">
                     <h4 className="font-medium text-[#553D8A]">AI Enhancement Information</h4>
                     <p className="text-sm text-gray-600 mt-1">
@@ -112,7 +120,7 @@ export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComp
                   </div>
                 )}
 
-                {character.isLocked ? (
+                {character.isLocked && !userIsAdmin ? (
                   <CustomButton
                     className="w-full"
                     variant="outline"
@@ -130,7 +138,7 @@ export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComp
                       Generate
                     </CustomButton>
                     
-                    {!character.loraFileId && userIsAdmin && (
+                    {(!character.loraFileId && userIsAdmin) && (
                       <CustomButton
                         className="w-full"
                         variant="outline"

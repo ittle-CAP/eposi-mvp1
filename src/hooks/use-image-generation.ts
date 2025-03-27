@@ -5,6 +5,8 @@ import { useCharacterManagement } from "./use-character-management";
 import { useReplicateGeneration } from "./use-replicate-generation";
 import { ReplicateGenerationOptions } from "@/types/replicate";
 import { useErrorHandler } from "@/utils/error-handling";
+import { isAdmin } from "@/utils/permissions";
+import { useAuth } from "@/components/AuthProvider";
 
 // Define trigger words for characters
 const CHARACTER_TRIGGER_WORDS: Record<string, string[]> = {
@@ -24,6 +26,7 @@ export const useImageGeneration = () => {
   const [generationError, setGenerationError] = useState<string>("");
   const { toast } = useToast();
   const { handleGenerationError } = useErrorHandler();
+  const { user } = useAuth();
   
   const {
     selectedCharacter,
@@ -69,35 +72,79 @@ export const useImageGeneration = () => {
   const handleImageGenerate = async () => {
     setGenerationError("");
     try {
-      // Check if we have any unlocked characters first
-      if (unlockedCharacters.length === 0) {
-        console.log("No unlocked characters available");
-        throw new Error("No characters available. Please unlock a character first.");
+      // Check if the user is admin
+      let userIsAdmin = false;
+      if (user) {
+        userIsAdmin = await isAdmin(user.id);
       }
 
-      // Check if a character is selected
-      if (!selectedCharacter) {
-        console.log("No character selected");
-        throw new Error("Please select a character first");
+      // For admin users, we'll bypass character unlock checks
+      if (!userIsAdmin) {
+        // Check if we have any unlocked characters first
+        if (unlockedCharacters.length === 0) {
+          console.log("No unlocked characters available");
+          throw new Error("No characters available. Please unlock a character first.");
+        }
+
+        // Check if a character is selected
+        if (!selectedCharacter) {
+          console.log("No character selected");
+          throw new Error("Please select a character first");
+        }
+        
+        const character = unlockedCharacters.find(char => char.id === selectedCharacter);
+        
+        if (!character) {
+          console.log(`Character not found: ${selectedCharacter}. Available characters:`, unlockedCharacters.map(c => c.id));
+          throw new Error("Character not found. Please select a different character.");
+        }
       }
       
-      const character = unlockedCharacters.find(char => char.id === selectedCharacter);
+      // Get the selected character - for admins, this might be a character they haven't unlocked yet
+      const allCharactersData = {
+        "8": {
+          name: "The Headless Horseman",
+          genre: "Horror",
+        },
+        "1": {
+          name: "Luna",
+          genre: "Fantasy",
+        },
+        "2": {
+          name: "Neo",
+          genre: "Sci-fi",
+        },
+        "7": {
+          name: "Mountain King",
+          genre: "Fantasy",
+        },
+        "11": {
+          name: "Among Us",
+          genre: "Gaming",
+        },
+        "12": {
+          name: "Fall Guys",
+          genre: "Gaming",
+        },
+        "13": {
+          name: "Minecraft",
+          genre: "Style",
+        }
+      };
       
-      if (!character) {
-        console.log(`Character not found: ${selectedCharacter}. Available characters:`, unlockedCharacters.map(c => c.id));
-        throw new Error("Character not found. Please select a different character.");
-      }
+      const selectedCharInfo = unlockedCharacters.find(char => char.id === selectedCharacter) || 
+        { id: selectedCharacter, name: allCharactersData[selectedCharacter as keyof typeof allCharactersData]?.name || "Unknown Character" };
       
-      console.log(`Generating image with character: ${character.name}, LoRA: ${character.loraFileId || 'none'}, strength: ${loraStrength}`);
+      console.log(`Generating image with character: ${selectedCharInfo.name}, strength: ${loraStrength}`);
       
       // Get character-specific trigger words
-      const triggerWords = CHARACTER_TRIGGER_WORDS[character.id] || [];
+      const triggerWords = CHARACTER_TRIGGER_WORDS[selectedCharacter] || [];
       
       // Append trigger words to the user's prompt if they exist
       let enhancedPrompt = prompt;
       if (triggerWords.length > 0) {
         enhancedPrompt = `${prompt}, ${triggerWords.join(', ')}`.trim();
-        console.log(`Applied hidden trigger words for ${character.name}: ${triggerWords.join(', ')}`);
+        console.log(`Applied hidden trigger words for ${selectedCharInfo.name}: ${triggerWords.join(', ')}`);
       }
       
       // Prepare generation options
@@ -109,17 +156,18 @@ export const useImageGeneration = () => {
       };
       
       // Only add LoRA options if the character has a LoRA file
-      if (character.loraFileUrl) {
-        generationOptions.loraUrl = character.loraFileUrl;
+      if (selectedCharInfo.loraFileUrl) {
+        generationOptions.loraUrl = selectedCharInfo.loraFileUrl;
         generationOptions.loraStrength = loraStrength;
       }
       
       // Start the generation process with Replicate
-      const success = await replicateGenerateImage(generationOptions);
+      // Admin users will bypass credit checks in the Replicate hook
+      const success = await replicateGenerateImage(generationOptions, userIsAdmin);
       
-      if (success) {
+      if (success && selectedCharacter) {
         // The image URL will be updated by the useReplicateGeneration hook
-        updateCharacterLastUsed(character.id);
+        updateCharacterLastUsed(selectedCharacter);
       }
     } catch (error) {
       console.error("Error in handleImageGenerate:", error);

@@ -1,5 +1,7 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { isAdmin } from "@/utils/permissions";
 
 export const useSubscription = () => {
   const { toast } = useToast();
@@ -11,7 +13,36 @@ export const useSubscription = () => {
 
       console.log('Unlocking character with details:', { characterId, characterName, imageUrl });
 
-      // First, check if user has available unlocks
+      // Check if user is admin - admins don't need to use credits
+      const adminStatus = await isAdmin(userData.user.id);
+      if (adminStatus) {
+        console.log('Admin user detected - bypassing unlock credit check');
+        
+        // Add character to unlocked_characters without checking/consuming credits
+        const { data: insertedChar, error: unlockError } = await supabase
+          .from('unlocked_characters')
+          .insert({
+            character_id: characterId,
+            character_name: characterName,
+            user_id: userData.user.id,
+            image_url: imageUrl
+          })
+          .select()
+          .single();
+
+        if (unlockError) throw unlockError;
+
+        console.log('Successfully inserted character for admin with data:', insertedChar);
+
+        toast({
+          title: "Success",
+          description: `Successfully unlocked ${characterName}`,
+        });
+
+        return true;
+      }
+
+      // For non-admin users, proceed with normal credit check
       const { data: subscription, error: subscriptionError } = await supabase
         .from('subscriptions')
         .select('unlocks_available')
