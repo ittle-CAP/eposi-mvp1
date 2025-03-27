@@ -153,6 +153,26 @@ export const useCharacters = () => {
       ...(characterLoras["7"] || {})
     },
     {
+      id: "11",
+      name: "Among Us",
+      genre: "Gaming",
+      imageUrl: "https://images.unsplash.com/photo-1498936178812-4b2e558d2937", // Placeholder
+      isLocked: !unlockedCharacterIds.includes("11"),
+      description: "A colorful, suspicious crewmate from the popular social deduction game. Distinguishable by its bean-like shape and visor, this character navigates tasks and evades impostors in space.",
+      unlocks: 1287,
+      ...(characterLoras["11"] || {})
+    },
+    {
+      id: "12",
+      name: "Fall Guys",
+      genre: "Gaming",
+      imageUrl: "https://images.unsplash.com/photo-1498936178812-4b2e558d2937", // Placeholder
+      isLocked: !unlockedCharacterIds.includes("12"),
+      description: "An adorable, wobbly bean contestant from the hit battle royale game. With a jelly-like body and customizable outfits, this character tumbles and bumbles through chaotic obstacle courses.",
+      unlocks: 1426,
+      ...(characterLoras["12"] || {})
+    },
+    {
       id: "9",
       name: "Watercolor Dreams",
       genre: "Style",
@@ -171,6 +191,16 @@ export const useCharacters = () => {
       description: "A vibrant cyberpunk-inspired visual style featuring electric neon colors, dramatic lighting, and futuristic urban environments.",
       unlocks: 1842,
       ...(characterLoras["10"] || {})
+    },
+    {
+      id: "13",
+      name: "Minecraft",
+      genre: "Style",
+      imageUrl: "https://images.unsplash.com/photo-1498936178812-4b2e558d2937", // Placeholder
+      isLocked: !unlockedCharacterIds.includes("13"),
+      description: "Transform any image into the iconic blocky aesthetic of Minecraft. This style features pixelated textures, distinctive cubic shapes, and the charming low-resolution look of the world's most popular sandbox game.",
+      unlocks: 1654,
+      ...(characterLoras["13"] || {})
     }
   ];
 

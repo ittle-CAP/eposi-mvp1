@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useCharacterManagement } from "./use-character-management";
@@ -15,7 +14,10 @@ const CHARACTER_TRIGGER_WORDS: Record<string, string[]> = {
   "4": [], // BuzzBot
   "5": [], // Detective Smith
   "6": [], // Savanna
-  "7": []  // Mountain King
+  "7": [], // Mountain King
+  "11": ["mikus-style"], // Among Us
+  "12": ["fallguys character"], // Fall Guys
+  "13": ["minecraft filter"] // Minecraft Style
 };
 
 export const useImageGeneration = () => {
