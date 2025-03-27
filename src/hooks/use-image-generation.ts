@@ -2,31 +2,28 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useCharacterManagement } from "./use-character-management";
 import { useReplicateGeneration } from "./use-replicate-generation";
-import { ReplicateGenerationOptions } from "@/types/replicate";
 import { useErrorHandler } from "@/utils/error-handling";
-import { isAdmin } from "@/utils/permissions";
 import { useAuth } from "@/components/AuthProvider";
 import { useCharacters } from "./use-characters";
-
-const CHARACTER_TRIGGER_WORDS: Record<string, string[]> = {
-  "8": ["zavy-hdlsshrsmn"],
-  "1": [],
-  "2": [],
-  "7": [],
-  "11": ["mikus-style"],
-  "12": ["fallguys character"],
-  "13": ["minecraft filter"]
-};
+import { useAdminCheck } from "./use-admin-check";
+import { useCharacterTriggerWords } from "./use-character-trigger-words";
+import { useCharacterData } from "./use-character-data";
+import { useGenerationOptions } from "./use-generation-options";
 
 export const useImageGeneration = () => {
   const [prompt, setPrompt] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string>("");
   const [generationError, setGenerationError] = useState<string>("");
+  
   const { toast } = useToast();
   const { handleGenerationError } = useErrorHandler();
   const { user } = useAuth();
   const { characters } = useCharacters();
+  const { userIsAdmin } = useAdminCheck();
+  const { enhancePromptWithTriggerWords } = useCharacterTriggerWords();
+  const { getCharacterInfoById } = useCharacterData();
+  const { createGenerationOptions } = useGenerationOptions();
   
   const {
     selectedCharacter,
@@ -54,9 +51,8 @@ export const useImageGeneration = () => {
   useEffect(() => {
     const autoSelectCharacter = async () => {
       // If admin, we keep the current selection
-      if (user) {
-        const userIsAdmin = await isAdmin(user.id);
-        if (userIsAdmin) return;
+      if (user && userIsAdmin) {
+        return;
       }
       
       // For regular users, auto-select the first unlocked character
@@ -67,7 +63,7 @@ export const useImageGeneration = () => {
     };
     
     autoSelectCharacter();
-  }, [selectedCharacter, unlockedCharacters, setSelectedCharacter, user]);
+  }, [selectedCharacter, unlockedCharacters, setSelectedCharacter, user, userIsAdmin]);
 
   useEffect(() => {
     if (replicateGenerationError) {
@@ -80,11 +76,6 @@ export const useImageGeneration = () => {
   const handleImageGenerate = async () => {
     setGenerationError("");
     try {
-      let userIsAdmin = false;
-      if (user) {
-        userIsAdmin = await isAdmin(user.id);
-      }
-
       if (!userIsAdmin) {
         if (unlockedCharacters.length === 0) {
           console.log("No unlocked characters available");
@@ -99,74 +90,26 @@ export const useImageGeneration = () => {
         const character = unlockedCharacters.find(char => char.id === selectedCharacter);
         
         if (!character) {
-          console.log(`Character not found: ${selectedCharacter}. Available characters:`, unlockedCharacters.map(c => c.id));
+          console.log(`Character not found: ${selectedCharacter}. Available characters:`, 
+            unlockedCharacters.map(c => c.id));
           throw new Error("Character not found. Please select a different character.");
         }
       }
 
-      const allCharactersData = {
-        "8": {
-          name: "The Headless Horseman",
-          genre: "Horror"
-        },
-        "1": {
-          name: "Luna",
-          genre: "Fantasy"
-        },
-        "2": {
-          name: "Neo",
-          genre: "Sci-fi"
-        },
-        "7": {
-          name: "Mountain King",
-          genre: "Fantasy"
-        },
-        "11": {
-          name: "Among Us",
-          genre: "Gaming"
-        },
-        "12": {
-          name: "Fall Guys",
-          genre: "Gaming"
-        },
-        "13": {
-          name: "Minecraft",
-          genre: "Style"
-        }
-      };
-
       // For admins, find the character in the full list of characters
-      let selectedCharInfo;
-      if (userIsAdmin && selectedCharacter) {
-        selectedCharInfo = characters.find(char => char.id === selectedCharacter);
-      } else {
-        selectedCharInfo = unlockedCharacters.find(char => char.id === selectedCharacter) || 
-          { id: selectedCharacter, name: allCharactersData[selectedCharacter as keyof typeof allCharactersData]?.name || "Unknown Character" };
-      }
+      const selectedCharInfo = userIsAdmin && selectedCharacter 
+        ? getCharacterInfoById(selectedCharacter, characters)
+        : getCharacterInfoById(selectedCharacter, unlockedCharacters);
       
       console.log(`Generating image with character: ${selectedCharInfo?.name}, strength: ${loraStrength}`);
       
-      const triggerWords = CHARACTER_TRIGGER_WORDS[selectedCharacter] || [];
+      const enhancedPrompt = enhancePromptWithTriggerWords(prompt, selectedCharacter);
       
-      let enhancedPrompt = prompt;
-      if (triggerWords.length > 0) {
-        enhancedPrompt = `${prompt}, ${triggerWords.join(', ')}`.trim();
-        console.log(`Applied hidden trigger words for ${selectedCharInfo?.name}: ${triggerWords.join(', ')}`);
-      }
-      
-      const generationOptions: ReplicateGenerationOptions = {
-        prompt: enhancedPrompt,
-        width: 512,
-        height: 512,
-        steps: 30
-      };
-      
-      if (selectedCharInfo && 'loraFileId' in selectedCharInfo && selectedCharInfo.loraFileId) {
-        if ('loraFileUrl' in selectedCharInfo && selectedCharInfo.loraFileUrl) {
-          generationOptions.loraUrl = selectedCharInfo.loraFileUrl;
-          generationOptions.loraStrength = loraStrength;
-        }
-      }
+      const generationOptions = createGenerationOptions(
+        enhancedPrompt, 
+        selectedCharInfo, 
+        loraStrength
+      );
       
       const success = await replicateGenerateImage(generationOptions, userIsAdmin);
       
