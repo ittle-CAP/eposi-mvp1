@@ -151,6 +151,26 @@ export const useCharacters = () => {
       description: "The legendary ruler of the mountain realms, wielding ancient magic.",
       unlocks: 2341,
       ...(characterLoras["7"] || {})
+    },
+    {
+      id: "9",
+      name: "Watercolor Dreams",
+      genre: "Style",
+      imageUrl: "https://images.unsplash.com/photo-1550859492-d5da9d8e45f3",
+      isLocked: !unlockedCharacterIds.includes("9"),
+      description: "A dreamy watercolor art style that transforms your characters into fluid, vibrant paintings with soft edges and translucent color blending.",
+      unlocks: 1275,
+      ...(characterLoras["9"] || {})
+    },
+    {
+      id: "10",
+      name: "Neon Future",
+      genre: "Style",
+      imageUrl: "https://images.unsplash.com/photo-1550745165-9bc0b252726f",
+      isLocked: !unlockedCharacterIds.includes("10"),
+      description: "A vibrant cyberpunk-inspired visual style featuring electric neon colors, dramatic lighting, and futuristic urban environments.",
+      unlocks: 1842,
+      ...(characterLoras["10"] || {})
     }
   ];
 

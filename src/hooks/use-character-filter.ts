@@ -12,7 +12,7 @@ export const useCharacterFilter = (characters: Character[]) => {
     return matchesSearch && matchesGenre;
   });
 
-  const genres = ["All", "Fantasy", "Sci-fi", "Anime", "Gaming", "Television", "Film"];
+  const genres = ["All", "Fantasy", "Sci-fi", "Anime", "Gaming", "Television", "Film", "Horror", "Style"];
 
   return {
     searchQuery,

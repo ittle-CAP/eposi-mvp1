@@ -23,7 +23,7 @@ const Characters = () => {
   } = useCharacterFilter(characters);
 
   useEffect(() => {
-    document.title = "Characters | AI Video Generator";
+    document.title = "Characters & Styles | AI Video Generator";
   }, []);
 
   const handleSelectCharacter = (character: Character) => {
@@ -52,10 +52,10 @@ const Characters = () => {
       <Header />
       <div className="container mx-auto px-4 pt-24">
         <div className="mb-8">
-          <h1 className="mb-4 text-3xl font-bold">Characters</h1>
+          <h1 className="mb-4 text-3xl font-bold">Characters & Styles</h1>
           <p className="text-gray-600">
-            Choose from our collection of AI characters to create unique videos and images.
-            Unlock characters using your subscription unlocks.
+            Choose from our collection of AI characters and style presets to create unique videos and images.
+            Unlock characters and styles using your subscription unlocks.
           </p>
         </div>
 
