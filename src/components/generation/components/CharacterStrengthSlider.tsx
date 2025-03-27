@@ -22,7 +22,20 @@ export const CharacterStrengthSlider = ({
   }, [loraStrength]);
 
   const handleSliderChange = (value: number[]) => {
+    if (!value || value.length === 0) return;
+    
     const newStrength = value[0];
+    
+    // Validate the strength is within expected range
+    if (newStrength < 0.1 || newStrength > 1.0) {
+      console.warn(`LoRA strength outside valid range: ${newStrength}, clamping to valid range`);
+      const clampedValue = Math.max(0.1, Math.min(1.0, newStrength));
+      setSliderValue([clampedValue]);
+      setLoraStrength(clampedValue);
+      console.log(`LoRA strength clamped to: ${clampedValue}`);
+      return;
+    }
+    
     setSliderValue(value);
     setLoraStrength(newStrength);
     console.log(`LoRA strength updated to: ${newStrength}`);

@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { ReplicateGenerationOptions, ReplicateResponse } from "@/types/replicate";
 
@@ -24,16 +25,35 @@ export const startImageGeneration = async (options: ReplicateGenerationOptions):
     body.seed = Math.floor(Math.random() * 2147483647);
   }
   
-  // Only include LoRA options if a LoRA URL is provided
-  if (options.loraUrl && options.loraUrl.trim() !== "") {
-    // Ensure we're using the exact parameter names expected by the Replicate API
-    body.loraUrl = options.loraUrl;
-    
-    // Make sure strength is a number and has a valid value
-    const strength = Number(options.loraStrength);
-    body.loraStrength = !isNaN(strength) ? strength : 0.7;
-    
-    console.log(`Using LoRA with URL: ${body.loraUrl} and strength: ${body.loraStrength}`);
+  // Only include LoRA options if a LoRA URL is provided and is valid
+  if (options.loraUrl && typeof options.loraUrl === 'string' && options.loraUrl.trim() !== "") {
+    // Ensure the URL is valid-looking
+    if (!options.loraUrl.startsWith('http') && options.loraUrl !== 'test-lora-url') {
+      console.warn(`Invalid LoRA URL: ${options.loraUrl}. URLs should start with http/https.`);
+    } else {
+      // For test LoRA on Fall Guys, use a special case with max strength
+      const isFallGuysTest = options.loraUrl === 'test-lora-url';
+      
+      // Ensure we use the exact parameter names expected by the API
+      body.loraUrl = options.loraUrl;
+      
+      // Parse and validate loraStrength
+      let strength = parseFloat(String(options.loraStrength));
+      if (isNaN(strength) || strength < 0.1 || strength > 1.0) {
+        console.warn(`Invalid LoRA strength: ${options.loraStrength}. Setting to default 0.7`);
+        strength = 0.7;
+      }
+      
+      // Use maximum strength for test LoRA
+      if (isFallGuysTest) {
+        strength = 1.0;
+        console.log("Using test LoRA for Fall Guys with maximum strength of 1.0");
+      }
+      
+      body.loraStrength = strength;
+      
+      console.log(`Using LoRA with URL: ${body.loraUrl} and strength: ${body.loraStrength}`);
+    }
   } else {
     console.log("No LoRA specified, using base model");
     // Explicitly set empty LoRA parameters to ensure clean generation
