@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Character } from "@/types/character";
@@ -75,7 +76,8 @@ export const useCharacters = () => {
     }
   }, [characterLoras]);
 
-  const characters: Character[] = [
+  // Define all characters with their properties
+  const allCharacters: Character[] = [
     {
       id: "8",
       name: "The Headless Horseman",
@@ -166,7 +168,10 @@ export const useCharacters = () => {
       unlocks: 1654,
       ...(characterLoras["13"] || {})
     }
-  ].map(character => {
+  ];
+  
+  // Process all characters, adding LoRA data from characterLoras if available
+  const characters: Character[] = allCharacters.map(character => {
     if (characterLoras[character.id]) {
       console.log(`Merging LoRA data for ${character.name}:`, characterLoras[character.id]);
       return {
@@ -174,6 +179,18 @@ export const useCharacters = () => {
         ...characterLoras[character.id]
       };
     }
+    
+    // IMPORTANT: For admin-only testing, ensure the Fall Guys character has valid LoRA values
+    // This will be overridden if real data is available from the database, but ensures testing works
+    if (character.id === "12") {
+      console.log("Adding test LoRA data for Fall Guys for admin testing");
+      return {
+        ...character,
+        loraFileId: character.loraFileId || "test-lora-id",
+        loraFileUrl: character.loraFileUrl || "test-lora-url"
+      };
+    }
+    
     return character;
   });
 

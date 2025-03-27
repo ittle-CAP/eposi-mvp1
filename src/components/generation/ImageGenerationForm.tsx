@@ -77,19 +77,25 @@ export const ImageGenerationForm = ({
   // Get the selected character data
   const selectedCharacterData = displayCharacters.find(char => char.id === selectedCharacter);
   
-  // Explicitly check if the character has a complete LoRA configuration
-  const hasLora = selectedCharacter && selectedCharacterData ? 
-    (selectedCharacterData.loraFileId && 
-     selectedCharacterData.loraFileUrl && 
-     selectedCharacterData.loraFileId.length > 0 && 
-     selectedCharacterData.loraFileUrl.length > 0) : false;
+  // Check if the character has a complete LoRA configuration
+  // A character has a valid LoRA if both the ID and URL are present and non-empty
+  const hasLora = !!selectedCharacterData && 
+                  !!selectedCharacterData.loraFileId && 
+                  !!selectedCharacterData.loraFileUrl && 
+                  selectedCharacterData.loraFileId.length > 0 && 
+                  selectedCharacterData.loraFileUrl.length > 0;
   
   // Log detailed information for debugging
   console.log(`Selected character: ${selectedCharacter}, Has LoRA:`, hasLora);
-  console.log(`LoRA fields - ID: ${selectedCharacterData?.loraFileId || 'none'}, URL: ${selectedCharacterData?.loraFileUrl || 'none'}`);
-  
   if (selectedCharacterData) {
+    console.log(`LoRA fields for ${selectedCharacterData.name}:`, {
+      id: selectedCharacterData.loraFileId || 'none',
+      url: selectedCharacterData.loraFileUrl || 'none',
+      strength: selectedCharacterData.loraStrength || loraStrength
+    });
     console.log("Character data:", JSON.stringify(selectedCharacterData, null, 2));
+  } else {
+    console.log("No character selected or character not found");
   }
 
   const handleReplicateGenerate = () => {
