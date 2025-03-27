@@ -26,19 +26,23 @@ export const CharacterStrengthSlider = ({
     
     const newStrength = value[0];
     
-    // Validate the strength is within expected range
+    // Ensure the strength is within the valid range and round to 1 decimal place
+    // This prevents floating point precision issues
     if (newStrength < 0.1 || newStrength > 1.0) {
       console.warn(`LoRA strength outside valid range: ${newStrength}, clamping to valid range`);
       const clampedValue = Math.max(0.1, Math.min(1.0, newStrength));
-      setSliderValue([clampedValue]);
-      setLoraStrength(clampedValue);
-      console.log(`LoRA strength clamped to: ${clampedValue}`);
+      const roundedValue = Math.round(clampedValue * 10) / 10; // Round to 1 decimal place
+      setSliderValue([roundedValue]);
+      setLoraStrength(roundedValue);
+      console.log(`LoRA strength clamped and rounded to: ${roundedValue}`);
       return;
     }
     
-    setSliderValue(value);
-    setLoraStrength(newStrength);
-    console.log(`LoRA strength updated to: ${newStrength}`);
+    // Round to 1 decimal place for consistency
+    const roundedStrength = Math.round(newStrength * 10) / 10;
+    setSliderValue([roundedStrength]);
+    setLoraStrength(roundedStrength);
+    console.log(`LoRA strength updated to: ${roundedStrength}`);
   };
 
   return (

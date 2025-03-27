@@ -28,6 +28,10 @@ export const useGenerationOptions = () => {
       loraStrength: loraStrength
     } : "No character info");
     
+    // Generate a new random seed for each generation to ensure variety
+    generationOptions.seed = Math.floor(Math.random() * 2147483647);
+    console.log("- Generated random seed:", generationOptions.seed);
+    
     // Enhanced validation for LoRA information
     if (characterInfo) {
       // For test data (Fall Guys), handle special case
@@ -52,7 +56,8 @@ export const useGenerationOptions = () => {
           console.warn(`Invalid LoRA strength: ${loraStrength}. Setting to default 0.7`);
           generationOptions.loraStrength = 0.7;
         } else {
-          generationOptions.loraStrength = numericStrength;
+          // Round to 1 decimal place for consistency
+          generationOptions.loraStrength = Math.round(numericStrength * 10) / 10;
         }
         
         // For Fall Guys test, ensure maximum strength

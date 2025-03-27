@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -88,15 +89,26 @@ async function createPrediction(options: any) {
   if (options.loraUrl && options.loraUrl.trim() !== "") {
     console.log(`Using LoRA with URL: ${options.loraUrl} and strength: ${options.loraStrength || 0.7}`);
     
-    // CRITICAL FIX: Correctly map the parameter names used by the client to the exact names expected by the model
+    // CRITICAL: Correctly map the parameter names used by the client to the exact names expected by the model
     // The model expects "lora_url" and "lora_scale" instead of our client's camelCase names
     replicateBody.input.lora_url = options.loraUrl;
     
-    // Ensure strength is a valid number between 0 and 1
-    const strength = parseFloat(options.loraStrength);
-    replicateBody.input.lora_scale = !isNaN(strength) ? 
-      Math.max(0.1, Math.min(1.0, strength)) : // Clamp between 0.1 and 1.0
-      0.7; // Default if invalid
+    // Force explicit LoRA scale value for Fall Guys test character
+    if (options.loraUrl === 'test-lora-url') {
+      replicateBody.input.lora_scale = 1.0;
+      console.log("Using maximum LoRA scale (1.0) for test LoRA");
+    } else {
+      // For other LoRAs, ensure strength is a valid number between 0.1 and 1.0
+      const strength = parseFloat(options.loraStrength);
+      replicateBody.input.lora_scale = !isNaN(strength) ? 
+        Math.max(0.1, Math.min(1.0, strength)) : // Clamp between 0.1 and 1.0
+        0.7; // Default if invalid
+    }
+    
+    // Round to 1 decimal place for consistency
+    if (typeof replicateBody.input.lora_scale === 'number') {
+      replicateBody.input.lora_scale = Math.round(replicateBody.input.lora_scale * 10) / 10;
+    }
     
     console.log("Added LoRA parameters:", {
       lora_url: replicateBody.input.lora_url,

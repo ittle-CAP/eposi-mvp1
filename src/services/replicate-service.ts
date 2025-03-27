@@ -18,11 +18,12 @@ export const startImageGeneration = async (options: ReplicateGenerationOptions):
     negative_prompt: options.negativePrompt || "ugly, blurry, low quality, distorted, disfigured"
   };
   
-  // Add random seed if not provided
+  // Add random seed if not provided - IMPORTANT: Generate a new seed each time for variety
   if (options.seed) {
     body.seed = options.seed;
   } else {
     body.seed = Math.floor(Math.random() * 2147483647);
+    console.log(`Generated random seed: ${body.seed}`);
   }
   
   // Only include LoRA options if a LoRA URL is provided and is valid
@@ -44,10 +45,13 @@ export const startImageGeneration = async (options: ReplicateGenerationOptions):
         strength = 0.7;
       }
       
-      // Use maximum strength for test LoRA
+      // Use maximum strength for test LoRA and round to ensure consistency
       if (isFallGuysTest) {
         strength = 1.0;
         console.log("Using test LoRA for Fall Guys with maximum strength of 1.0");
+      } else {
+        // Round to 1 decimal place for consistency
+        strength = Math.round(strength * 10) / 10;
       }
       
       body.loraStrength = strength;
