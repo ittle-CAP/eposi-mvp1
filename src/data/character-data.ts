@@ -25,11 +25,11 @@ export const characterData: Character[] = [
   },
   {
     id: "2",
-    name: "Neo",
-    genre: "Sci-fi",
-    imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+    name: "Ciri",
+    genre: "Fantasy",
+    imageUrl: "/lovable-uploads/d8add5c3-44c9-462d-aa18-b8236fc62a57.png",
     isLocked: true,
-    description: "A digital warrior fighting against the machine world.",
+    description: "A powerful witcher with ashen hair and emerald eyes, capable of traveling between worlds. With her exceptional sword skills and mysterious Elder Blood powers, she navigates a world filled with danger and political intrigue.",
     unlocks: 2891
   },
   {

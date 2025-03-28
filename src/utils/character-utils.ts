@@ -55,10 +55,10 @@ export const predefinedCharacters = {
     description: "A mystical character with the power to control dreams and nightmares.",
   },
   "2": {
-    name: "Neo",
-    genre: "Sci-fi",
-    imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
-    description: "A digital warrior fighting against the machine world.",
+    name: "Ciri",
+    genre: "Fantasy",
+    imageUrl: "/lovable-uploads/d8add5c3-44c9-462d-aa18-b8236fc62a57.png",
+    description: "A powerful witcher with ashen hair and emerald eyes, capable of traveling between worlds. With her exceptional sword skills and mysterious Elder Blood powers, she navigates a world filled with danger and political intrigue.",
   },
   "7": {
     name: "Mountain King",
