@@ -7,7 +7,7 @@ export const useCharacterTriggerWords = () => {
   const CHARACTER_TRIGGER_WORDS: Record<string, string[]> = {
     "8": ["zavy-hdlsshrsmn"],
     "1": ["skeletor", "skull face and blue skin"],
-    "2": ["Ciri"],
+    "2": ["Ciri", "ciri_w3", "ciri_w3_outfit"],
     "7": [],
     "11": ["mikus-style"],
     "12": ["fallguys character"],
