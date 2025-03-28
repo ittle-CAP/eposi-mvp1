@@ -90,11 +90,11 @@ export const useCharacters = () => {
     },
     {
       id: "1",
-      name: "Luna",
+      name: "Skeletor",
       genre: "Fantasy",
-      imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
+      imageUrl: "/lovable-uploads/e61c7513-bea9-41d4-8787-6fe1b765181c.png",
       isLocked: !unlockedCharacterIds.includes("1"),
-      description: "A mystical character with the power to control dreams and nightmares.",
+      description: "The menacing arch-nemesis of He-Man from Eternia, with his iconic skull face and purple hood. Skeletor is a powerful sorcerer obsessed with conquering Castle Grayskull and ruling the universe. Despite his terrifying appearance and evil laugh, his dramatic flair and theatrical villainy have made him a beloved character.",
       unlocks: 1523,
       ...(characterLoras["1"] || {})
     },
