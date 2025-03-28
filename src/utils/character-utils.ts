@@ -57,7 +57,7 @@ export const predefinedCharacters = {
   "2": {
     name: "Ciri",
     genre: "Fantasy",
-    imageUrl: "/lovable-uploads/ae567c08-0654-4dfa-977b-eeb6a85ec1e4.png",
+    imageUrl: "/lovable-uploads/eb7976e6-3807-435e-aa44-c79ab6084986.png",
     description: "A powerful witcher with ashen hair and emerald eyes, capable of traveling between worlds. With her exceptional sword skills and mysterious Elder Blood powers, she navigates a world filled with danger and political intrigue.",
   },
   "7": {

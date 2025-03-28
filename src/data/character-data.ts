@@ -1,4 +1,3 @@
-
 import { Character } from "@/types/character";
 
 /**
@@ -27,7 +26,7 @@ export const characterData: Character[] = [
     id: "2",
     name: "Ciri",
     genre: "Fantasy",
-    imageUrl: "/lovable-uploads/ae567c08-0654-4dfa-977b-eeb6a85ec1e4.png",
+    imageUrl: "/lovable-uploads/eb7976e6-3807-435e-aa44-c79ab6084986.png",
     isLocked: true,
     description: "A powerful witcher with ashen hair and emerald eyes, capable of traveling between worlds. With her exceptional sword skills and mysterious Elder Blood powers, she navigates a world filled with danger and political intrigue.",
     unlocks: 2891
@@ -45,7 +44,7 @@ export const characterData: Character[] = [
     id: "11",
     name: "Among Us",
     genre: "Gaming",
-    imageUrl: "https://images.unsplash.com/photo-1498936178812-4b2e558d2937", // Placeholder
+    imageUrl: "https://images.unsplash.com/photo-1498936178812-4b2e558d2937",
     isLocked: true,
     description: "A colorful, suspicious crewmate from the popular social deduction game. Distinguishable by its bean-like shape and visor, this character navigates tasks and evades impostors in space.",
     unlocks: 1287
@@ -54,7 +53,7 @@ export const characterData: Character[] = [
     id: "12",
     name: "Fall Guys",
     genre: "Gaming",
-    imageUrl: "/lovable-uploads/6f604d07-68c5-475c-9f6a-516962cb65b4.png", // Updated to use the uploaded Fall Guys image
+    imageUrl: "/lovable-uploads/6f604d07-68c5-475c-9f6a-516962cb65b4.png",
     isLocked: true,
     description: "An adorable, wobbly bean contestant from the hit battle royale game. With a jelly-like body and customizable outfits, this character tumbles and bumbles through chaotic obstacle courses.",
     unlocks: 1426
@@ -81,7 +80,7 @@ export const characterData: Character[] = [
     id: "13",
     name: "Minecraft",
     genre: "Style",
-    imageUrl: "https://images.unsplash.com/photo-1498936178812-4b2e558d2937", // Placeholder
+    imageUrl: "https://images.unsplash.com/photo-1498936178812-4b2e558d2937",
     isLocked: true,
     description: "Transform any image into the iconic blocky aesthetic of Minecraft. This style features pixelated textures, distinctive cubic shapes, and the charming low-resolution look of the world's most popular sandbox game.",
     unlocks: 1654
