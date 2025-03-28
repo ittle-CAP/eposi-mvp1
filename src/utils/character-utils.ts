@@ -1,4 +1,3 @@
-
 import { Character } from "@/types/character";
 
 /**
@@ -25,6 +24,12 @@ export const applyLoraDataToCharacters = (
         loraFileId: character.loraFileId || "test-lora-id",
         loraFileUrl: character.loraFileUrl || "test-lora-url"
       };
+    }
+    
+    // Ensure LoRA data from presets is preserved
+    if (character.loraFileId && character.loraFileUrl) {
+      console.log(`Character ${character.name} already has LoRA data`);
+      return character;
     }
     
     return character;
@@ -59,6 +64,9 @@ export const predefinedCharacters = {
     genre: "Fantasy",
     imageUrl: "/lovable-uploads/eb7976e6-3807-435e-aa44-c79ab6084986.png",
     description: "A powerful witcher with ashen hair and emerald eyes, capable of traveling between worlds. With her exceptional sword skills and mysterious Elder Blood powers, she navigates a world filled with danger and political intrigue.",
+    loraFileId: "ciri-lora-id",
+    loraFileUrl: "https://example.com/ciri-lora.safetensors",
+    loraStrength: 0.7
   },
   "7": {
     name: "Mountain King",

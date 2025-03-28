@@ -29,7 +29,10 @@ export const characterData: Character[] = [
     imageUrl: "/lovable-uploads/eb7976e6-3807-435e-aa44-c79ab6084986.png",
     isLocked: true,
     description: "A powerful witcher with ashen hair and emerald eyes, capable of traveling between worlds. With her exceptional sword skills and mysterious Elder Blood powers, she navigates a world filled with danger and political intrigue.",
-    unlocks: 2891
+    unlocks: 2891,
+    loraFileId: "ciri-lora-id",
+    loraFileUrl: "https://example.com/ciri-lora.safetensors",
+    loraStrength: 0.7
   },
   {
     id: "7",
