@@ -6,7 +6,7 @@ export const useCharacterTriggerWords = () => {
   // Map of character IDs to their trigger words
   const CHARACTER_TRIGGER_WORDS: Record<string, string[]> = {
     "8": ["zavy-hdlsshrsmn"],
-    "1": [],
+    "1": ["skeletor", "skull face and blue skin"],
     "2": [],
     "7": [],
     "11": ["mikus-style"],
