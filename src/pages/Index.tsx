@@ -15,41 +15,28 @@ const Index = () => {
     setIsVisible(true);
   }, []);
 
-  return (
-    <div className="min-h-screen bg-black">
+  return <div className="min-h-screen bg-gradient-to-b from-[#1A1F2C] to-white">
       <Header />
 
       {/* Hero Section */}
-      <section className="relative pt-28 pb-36 md:pb-48">
-        <div className="container relative z-10 mx-auto px-4 text-center">
+      <section className="relative">
+        <div className="absolute inset-0 z-0">
+          <img src="/lovable-uploads/9d2f5aa3-5aba-45fe-9236-96bf12782e8e.png" alt="Misty lake with boat and church" className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-[#1A1F2C]" />
+        </div>
+
+        <div className="container relative z-10 mx-auto px-4 pt-32 pb-48 text-center">
           <div className="mx-auto max-w-3xl">
             <div className={`transform transition-all duration-1000 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}>
-              <h1 className="mb-5 text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight">
-                Fully Licensed Character Ready for Your Next AI Project
+              <h1 className="mb-6 text-5xl font-bold text-white sm:text-6xl">
+                Create with AI-Ready Licensed Characters
               </h1>
-              <p className="mb-10 text-lg md:text-xl text-gray-300 font-medium">
-                Discover professional characters with standardized contracts, clear usage rights, and AI-based content creation—all in one place.
+              <p className="mb-8 text-lg text-gray-200">
+                Create Stunning Videos and Images with Professional Characters, All Fully Licensed and Ready For Your AI Projects.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <CustomButton
-                  size="lg"
-                  className="h-14 px-10 text-lg bg-[#9b87f5] text-black font-bold hover:bg-[#7E69AB] transition-all"
-                  onClick={() => navigate("/characters")}
-                >
-                  Browse Characters
-                </CustomButton>
-                <CustomButton
-                  size="lg"
-                  variant="outline"
-                  className="h-14 px-10 text-lg border-2 border-[#9b87f5] text-[#9b87f5] font-bold hover:bg-[#9b87f5] hover:text-black transition-all"
-                  onClick={() => {
-                    const howItWorks = document.getElementById('how-it-works-section');
-                    if (howItWorks) {
-                      howItWorks.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                >
-                  How it Works
+              <div className="flex justify-center">
+                <CustomButton size="lg" className="h-14 px-12 text-lg" onClick={() => !user ? navigate("/auth") : navigate("/generate")}>
+                  {user ? "Start Creating" : "Sign Up to Start"}
                 </CustomButton>
               </div>
             </div>
@@ -58,23 +45,11 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="container relative z-20 mx-auto px-4" id="how-it-works-section">
-        <div className="grid -mt-20 gap-8 md:grid-cols-3">
-          <FeatureCard
-            icon="skills"
-            title="No Technical Skills Needed"
-            description="Easily generate visuals with our AI tool."
-          />
-          <FeatureCard
-            icon="ai"
-            title="AI-Powered Creation"
-            description="Ensure consistent style and personality across every output."
-          />
-          <FeatureCard
-            icon="security"
-            title="Legal & Secure"
-            description="Standardized contracts, transparent pricing, and compliant outputs."
-          />
+      <section className="container relative z-20 mx-auto px-4">
+        <div className="grid -mt-24 gap-8 md:grid-cols-3">
+          <FeatureCard icon="skills" title="No Technical Skills Needed" description="Create professional content with any additional data files or technical expertise." />
+          <FeatureCard icon="ai" title="AI-Powered Creation" description="Leverage cutting-edge AI technology to bring your characters to life." />
+          <FeatureCard icon="security" title="Legal & Secure" description="All characters are fully licensed and ready for respective usage." />
         </div>
       </section>
 
@@ -224,8 +199,7 @@ const Index = () => {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
 
 export default Index;
