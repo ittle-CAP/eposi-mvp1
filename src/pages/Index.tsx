@@ -15,7 +15,8 @@ const Index = () => {
     setIsVisible(true);
   }, []);
 
-  return <div className="min-h-screen bg-gradient-to-b from-[#1A1F2C] to-white">
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#1A1F2C] to-white">
       <Header />
 
       {/* Hero Section */}
@@ -29,14 +30,26 @@ const Index = () => {
           <div className="mx-auto max-w-3xl">
             <div className={`transform transition-all duration-1000 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}>
               <h1 className="mb-6 text-5xl font-bold text-white sm:text-6xl">
-                Create with AI-Ready Licensed Characters
+                Fully Licensed Character Ready for Your Next AI Project
               </h1>
               <p className="mb-8 text-lg text-gray-200">
-                Create Stunning Videos and Images with Professional Characters, All Fully Licensed and Ready For Your AI Projects.
+                Discover professional characters with standardized contracts, clear usage rights, and AI-based content creation—all in one place.
               </p>
-              <div className="flex justify-center">
-                <CustomButton size="lg" className="h-14 px-12 text-lg" onClick={() => !user ? navigate("/auth") : navigate("/generate")}>
-                  {user ? "Start Creating" : "Sign Up to Start"}
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <CustomButton
+                  size="lg"
+                  className="h-14 px-12 text-lg"
+                  onClick={() => navigate("/characters")}
+                >
+                  Browse Characters
+                </CustomButton>
+                <CustomButton
+                  variant="outline"
+                  size="lg"
+                  className="h-14 px-12 text-lg border-2 border-[#553D8A] text-[#553D8A] hover:bg-[#553D8A] hover:text-white"
+                  onClick={() => navigate("/how-it-works")}
+                >
+                  How it Works
                 </CustomButton>
               </div>
             </div>
@@ -47,9 +60,21 @@ const Index = () => {
       {/* Features Section */}
       <section className="container relative z-20 mx-auto px-4">
         <div className="grid -mt-24 gap-8 md:grid-cols-3">
-          <FeatureCard icon="skills" title="No Technical Skills Needed" description="Create professional content with any additional data files or technical expertise." />
-          <FeatureCard icon="ai" title="AI-Powered Creation" description="Leverage cutting-edge AI technology to bring your characters to life." />
-          <FeatureCard icon="security" title="Legal & Secure" description="All characters are fully licensed and ready for respective usage." />
+          <FeatureCard
+            icon="skills"
+            title="No Technical Skills Needed"
+            description="Easily generate visuals with our AI tool."
+          />
+          <FeatureCard
+            icon="ai"
+            title="AI-Powered Creation"
+            description="Ensure consistent style and personality across every output."
+          />
+          <FeatureCard
+            icon="security"
+            title="Legal & Secure"
+            description="Standardized contracts, transparent pricing, and compliant outputs."
+          />
         </div>
       </section>
 
@@ -199,7 +224,8 @@ const Index = () => {
           </div>
         </div>
       </section>
-    </div>;
+    </div>
+  );
 };
 
 export default Index;
