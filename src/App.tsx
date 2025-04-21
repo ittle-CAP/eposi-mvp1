@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,7 @@ import SubscriptionDashboard from "./pages/SubscriptionDashboard";
 import VideoGeneration from "./pages/VideoGeneration";
 import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
+import LicensingPricing from "./pages/LicensingPricing";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +42,7 @@ const App = () => (
                 <Analytics />
               </ProtectedRoute>
             } />
+            <Route path="/licensing" element={<LicensingPricing />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
