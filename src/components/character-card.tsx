@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Lock } from "lucide-react";
+import { Lock, Info } from "lucide-react";
 import { CustomButton } from "@/components/ui/custom-button";
 import { useNavigate } from "react-router-dom";
 import { UnlockConfirmationDialog } from "@/components/characters/unlock-confirmation-dialog";
@@ -12,9 +12,10 @@ interface CharacterCardProps {
   character: Character;
   onClick: () => void;
   onUnlock?: (character: Character) => void;
+  licenses?: string[];
 }
 
-export const CharacterCard = ({ character, onClick, onUnlock }: CharacterCardProps) => {
+export const CharacterCard = ({ character, onClick, onUnlock, licenses = ["Personal"] }: CharacterCardProps) => {
   const navigate = useNavigate();
   const [showUnlockConfirmation, setShowUnlockConfirmation] = useState(false);
   const { unlockCharacter } = useSubscription();
@@ -61,6 +62,13 @@ export const CharacterCard = ({ character, onClick, onUnlock }: CharacterCardPro
           )}
         </div>
         
+        {/* LICENSES INFO ICON */}
+        <div className="absolute top-2 right-2 flex items-center gap-1 z-10 bg-white/80 rounded px-2 py-1 shadow">
+          <Info className="h-4 w-4 text-[#553D8A]" />
+          <span className="text-xs text-gray-700">
+            {licenses.length === 1 ? licenses[0] + " License" : licenses.join(" / ") + " Licenses"}
+          </span>
+        </div>
         <div className="p-4">
           <h3 className="text-lg font-semibold text-gray-900">{character.name}</h3>
           <p className="text-sm text-gray-500">{character.genre}</p>

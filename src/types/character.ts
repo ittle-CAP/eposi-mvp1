@@ -10,4 +10,6 @@ export interface Character {
   loraFileId?: string;
   loraFileUrl?: string;
   loraStrength?: number;
+  // ADDED FOR LICENSE INFO
+  licenses?: string[];
 }

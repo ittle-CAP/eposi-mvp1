@@ -3,7 +3,7 @@ import { CharacterCard } from "@/components/character-card";
 import { Character } from "@/types/character";
 
 interface CharacterGridProps {
-  characters: Character[];
+  characters: (Character & { licenses?: string[] })[];
   unlockedCharacterIds: string[];
   onSelectCharacter: (character: Character) => void;
   onUnlock?: (character: Character) => void;
@@ -20,16 +20,17 @@ export const CharacterGrid = ({
       {characters.map((character) => {
         // Check if character is unlocked
         const isUnlocked = unlockedCharacterIds.includes(character.id);
-        
+
         return (
           <CharacterCard
             key={character.id}
             character={{
               ...character,
-              isLocked: !isUnlocked
+              isLocked: !isUnlocked,
             }}
             onClick={() => onSelectCharacter(character)}
             onUnlock={onUnlock}
+            licenses={character.licenses || ["Personal"]}
           />
         );
       })}

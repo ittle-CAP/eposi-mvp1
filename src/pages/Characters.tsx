@@ -11,6 +11,9 @@ import { Header } from "@/components/navigation/header";
 import { isAdmin } from "@/utils/permissions";
 import { useAuth } from "@/components/AuthProvider";
 
+// Define license types (should match your licensing pages)
+const LICENSE_TYPES = ["All", "Personal", "Creator", "Commercial"];
+
 const Characters = () => {
   const { characters, unlockedCharacterIds, fetchUnlockedCharacters } = useCharacters();
   const { unlockCharacter } = useSubscription();
@@ -20,12 +23,31 @@ const Characters = () => {
     setSearchQuery, 
     selectedGenre, 
     setSelectedGenre, 
-    filteredCharacters,
+    filteredCharacters: baseFilteredCharacters,
     genres 
   } = useCharacterFilter(characters);
   const { user } = useAuth();
   const [userIsAdmin, setUserIsAdmin] = useState(false);
   const [processedCharacters, setProcessedCharacters] = useState<Character[]>([]);
+  const [selectedLicense, setSelectedLicense] = useState("All");
+
+  // For demonstration, add licenses mock data if not present (temporary)
+  function withLicenses(character: Character): Character & { licenses: string[] } {
+    if ("licenses" in character) return character as any;
+    // Sample logic to mix licenses per genre
+    const genreLicenses = {
+      Fantasy: ["Personal", "Creator"],
+      "Sci-fi": ["Personal", "Creator", "Commercial"],
+      Anime: ["Creator"],
+      Gaming: ["Personal", "Creator"],
+      Television: ["Commercial"],
+      Film: ["Creator", "Commercial"],
+      Horror: ["Personal"],
+      Style: ["Personal", "Creator", "Commercial"]
+    };
+    const licenses = genreLicenses[character.genre] || ["Personal"];
+    return { ...character, licenses };
+  }
 
   useEffect(() => {
     document.title = "Characters & Styles | AI Video Generator";
@@ -39,24 +61,27 @@ const Characters = () => {
         setUserIsAdmin(adminStatus);
       }
     };
-    
     checkAdminStatus();
   }, [user]);
 
-  // Process characters based on admin status
+  // Process characters based on admin status and selectedLicense
   useEffect(() => {
-    let processed = [...filteredCharacters];
-    
-    // If user is admin, mark all characters as unlocked in the UI
+    let filtered = baseFilteredCharacters.map(withLicenses);
+    // License filtering
+    if (selectedLicense && selectedLicense !== "All") {
+      filtered = filtered.filter(c =>
+        Array.isArray(c.licenses) && c.licenses.includes(selectedLicense)
+      );
+    }
+    // If admin, unlock all characters
     if (userIsAdmin) {
-      processed = processed.map(character => ({
+      filtered = filtered.map(character => ({
         ...character,
         isLocked: false
       }));
     }
-    
-    setProcessedCharacters(processed);
-  }, [filteredCharacters, userIsAdmin]);
+    setProcessedCharacters(filtered);
+  }, [baseFilteredCharacters, userIsAdmin, selectedLicense]);
 
   const handleSelectCharacter = (character: Character) => {
     setSelectedCharacter(character);
@@ -65,13 +90,11 @@ const Characters = () => {
   const handleUnlockCharacter = async (character: Character) => {
     const success = await unlockCharacter(character.id, character.name, character.imageUrl);
     if (success) {
-      // Refresh the character data after unlock
       fetchUnlockedCharacters();
     }
   };
 
   const handleLoraUploadComplete = () => {
-    // Refresh the character data after LoRA upload
     fetchUnlockedCharacters();
   };
 
@@ -90,6 +113,9 @@ const Characters = () => {
             {!userIsAdmin && "Unlock your favorites using your subscription credits."}
             {userIsAdmin && "As an admin, you have access to all characters."}
           </p>
+          <p className="mt-4 text-gray-500">
+            Each character comes with flexible licensing options. Please review available tiers before generating content.
+          </p>
         </div>
 
         <SearchFilter
@@ -98,6 +124,9 @@ const Characters = () => {
           selectedGenre={selectedGenre}
           setSelectedGenre={setSelectedGenre}
           genres={genres}
+          selectedLicense={selectedLicense}
+          setSelectedLicense={setSelectedLicense}
+          licenseTypes={LICENSE_TYPES}
         />
 
         <CharacterGrid
