@@ -1,5 +1,6 @@
 
 import React from "react";
+import { Header } from "@/components/navigation/header";
 
 const LICENSES = [
   {
@@ -55,35 +56,39 @@ const FAQ = [
 ];
 
 const LicensingPricing: React.FC = () => (
-  <div className="container mx-auto max-w-5xl px-4 py-12">
-    <h1 className="text-3xl md:text-4xl font-bold text-center mb-3">Choose the Right License for Your Project</h1>
-    <p className="text-lg text-muted-foreground text-center mb-10">
-      Clear terms. Fair pricing. Hassle-free.
-    </p>
-    <div className="grid md:grid-cols-3 gap-8 mb-12">
-      {LICENSES.map((license) => (
-        <div key={license.title} className="rounded-lg bg-white shadow-md border border-muted p-6 flex flex-col">
-          <h2 className="text-xl font-semibold mb-4 text-[#553D8A]">{license.title}</h2>
-          <ul className="list-disc list-inside space-y-2 text-gray-700 flex-1">
-            {license.bullets.map((item, idx) => (
-              <li key={idx}>{item}</li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-    <section className="bg-gray-50 rounded-xl px-6 py-8 shadow-sm">
-      <h3 className="text-2xl font-semibold mb-4 text-[#553D8A]">Frequently Asked Questions</h3>
-      <ul className="space-y-6">
-        {FAQ.map(({ question, answer }, idx) => (
-          <li key={idx}>
-            <p className="font-semibold">{question}</p>
-            <p className="text-gray-700">{answer}</p>
-          </li>
+  <>
+    <Header />
+    <div className="container mx-auto max-w-5xl px-4 py-12 mt-16">
+      <h1 className="text-3xl md:text-4xl font-bold text-center mb-3">Choose the Right License for Your Project</h1>
+      <p className="text-lg text-muted-foreground text-center mb-10">
+        Clear terms. Fair pricing. Hassle-free.
+      </p>
+      <div className="grid md:grid-cols-3 gap-8 mb-12">
+        {LICENSES.map((license) => (
+          <div key={license.title} className="rounded-lg bg-white shadow-md border border-muted p-6 flex flex-col">
+            <h2 className="text-xl font-semibold mb-4 text-[#553D8A]">{license.title}</h2>
+            <ul className="list-disc list-inside space-y-2 text-gray-700 flex-1">
+              {license.bullets.map((item, idx) => (
+                <li key={idx}>{item}</li>
+              ))}
+            </ul>
+          </div>
         ))}
-      </ul>
-    </section>
-  </div>
+      </div>
+      <section className="bg-gray-50 rounded-xl px-6 py-8 shadow-sm">
+        <h3 className="text-2xl font-semibold mb-4 text-[#553D8A]">Frequently Asked Questions</h3>
+        <ul className="space-y-6">
+          {FAQ.map(({ question, answer }, idx) => (
+            <li key={idx}>
+              <p className="font-semibold">{question}</p>
+              <p className="text-gray-700">{answer}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </>
 );
 
 export default LicensingPricing;
+
