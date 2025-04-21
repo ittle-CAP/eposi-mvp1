@@ -32,6 +32,9 @@ export const Header = () => {
             <Link to="/community" className="text-sm font-medium text-gray-600 hover:text-gray-900">
               Community
             </Link>
+            <Link to="/licensing" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+              Licensing
+            </Link>
             {user && (
               <CustomButton 
                 onClick={() => navigate("/generate")}
