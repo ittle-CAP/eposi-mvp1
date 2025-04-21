@@ -9,6 +9,7 @@ import { useAdminCheck } from "./use-admin-check";
 import { useCharacterTriggerWords } from "./use-character-trigger-words";
 import { useCharacterData } from "./use-character-data";
 import { useGenerationOptions } from "./use-generation-options";
+import { getDefaultLoraStrength } from "@/utils/lora-util";
 
 export const useImageGeneration = () => {
   const [prompt, setPrompt] = useState<string>("");
@@ -72,6 +73,14 @@ export const useImageGeneration = () => {
       setGenerationError("");
     }
   }, [replicateGenerationError]);
+
+  useEffect(() => {
+    if (selectedCharacter && unlockedCharacters.length > 0) {
+      const char = unlockedCharacters.find(c => c.id === selectedCharacter);
+      const effective = getDefaultLoraStrength(char);
+      if (loraStrength !== effective) setLoraStrength(effective);
+    }
+  }, [selectedCharacter, unlockedCharacters]);
 
   const handleImageGenerate = async () => {
     setGenerationError("");

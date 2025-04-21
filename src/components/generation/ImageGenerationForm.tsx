@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Character } from "@/types/character";
 import { useReplicateGeneration } from "@/hooks/use-replicate-generation";
@@ -11,6 +10,7 @@ import { CharacterStrengthSlider } from "./components/CharacterStrengthSlider";
 import { GenerationControls } from "./components/GenerationControls";
 import { ImagePreview } from "./components/ImagePreview";
 import { useCharacterData } from "@/hooks/use-character-data";
+import { getDefaultLoraStrength, hasLora } from "@/utils/lora-util";
 
 interface ImageGenerationFormProps {
   selectedCharacter: string;
@@ -50,7 +50,6 @@ export const ImageGenerationForm = ({
     generationError,
   } = useReplicateGeneration();
   
-  // Check if user is admin
   useEffect(() => {
     const checkAdminStatus = async () => {
       if (user) {
@@ -62,7 +61,6 @@ export const ImageGenerationForm = ({
     checkAdminStatus();
   }, [user]);
   
-  // Track errors from the Replicate generation hook
   useEffect(() => {
     if (generationError) {
       setError(generationError);
@@ -71,32 +69,17 @@ export const ImageGenerationForm = ({
     }
   }, [generationError]);
 
-  // Determine which characters to display in the dropdown
   const displayCharacters = isUserAdmin ? characters : unlockedCharacters;
-  
-  // Get the selected character data
-  const selectedCharacterData = displayCharacters.find(char => char.id === selectedCharacter);
-  
-  // Check if the character has a complete LoRA configuration
-  // A character has a valid LoRA if both the ID and URL are present and non-empty
-  const hasLora = !!selectedCharacterData && 
-                  !!selectedCharacterData.loraFileId && 
-                  !!selectedCharacterData.loraFileUrl && 
-                  selectedCharacterData.loraFileId.length > 0 && 
-                  selectedCharacterData.loraFileUrl.length > 0;
-  
-  // Log detailed information for debugging
-  console.log(`Selected character: ${selectedCharacter}, Has LoRA:`, hasLora);
-  if (selectedCharacterData) {
-    console.log(`LoRA fields for ${selectedCharacterData.name}:`, {
-      id: selectedCharacterData.loraFileId || 'none',
-      url: selectedCharacterData.loraFileUrl || 'none',
-      strength: selectedCharacterData.loraStrength || loraStrength
-    });
-    console.log("Character data:", JSON.stringify(selectedCharacterData, null, 2));
-  } else {
-    console.log("No character selected or character not found");
-  }
+  const selectedCharacterData = displayCharacters.find((char: any) => char.id === selectedCharacter);
+
+  const hasLoraEnabled = hasLora(selectedCharacterData);
+  const effectiveLoraStrength = hasLoraEnabled ? getDefaultLoraStrength(selectedCharacterData) : loraStrength;
+
+  useEffect(() => {
+    if (hasLoraEnabled && setLoraStrength && loraStrength !== 1.0) {
+      setLoraStrength(1.0);
+    }
+  }, [hasLoraEnabled, setLoraStrength]);
 
   const handleReplicateGenerate = () => {
     setError(null);
@@ -106,11 +89,9 @@ export const ImageGenerationForm = ({
       return;
     }
     
-    // Use the parent generation method which is connected to useImageGeneration
     parentHandleGenerate();
   };
 
-  // Determine which loading state to use
   const activeIsGenerating = parentIsGenerating;
 
   return (
@@ -126,9 +107,9 @@ export const ImageGenerationForm = ({
         setPrompt={setPrompt}
       />
 
-      {hasLora && setLoraStrength && (
+      {hasLoraEnabled && setLoraStrength && (
         <CharacterStrengthSlider 
-          loraStrength={loraStrength}
+          loraStrength={effectiveLoraStrength}
           setLoraStrength={setLoraStrength}
         />
       )}

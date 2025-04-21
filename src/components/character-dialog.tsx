@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CustomButton } from "@/components/ui/custom-button";
@@ -11,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { isAdmin } from "@/utils/permissions";
+import { hasLora } from "@/utils/lora-util";
 
 interface CharacterDialogProps {
   character: Character | null;
@@ -67,7 +67,6 @@ export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComp
     }
   };
 
-  // Admin users can access all characters regardless of locked status
   const effectivelyUnlocked = !character.isLocked || userIsAdmin;
 
   return (
@@ -77,11 +76,6 @@ export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComp
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {character.name}
-              {effectivelyUnlocked && character.loraFileId && (
-                <Badge variant="outline" className="ml-2 bg-[#553D8A]/10 text-[#553D8A] border-[#553D8A]/20">
-                  LoRA Enabled
-                </Badge>
-              )}
               {userIsAdmin && character.isLocked && (
                 <Badge variant="outline" className="ml-2 bg-amber-100 text-amber-800 border-amber-200">
                   Admin Access
@@ -107,18 +101,6 @@ export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComp
                     Unlocks: {character.unlocks.toLocaleString()}
                   </span>
                 </div>
-
-                {effectivelyUnlocked && character.loraFileId && (
-                  <div className="rounded-lg bg-[#553D8A]/5 p-3 border border-[#553D8A]/10">
-                    <h4 className="font-medium text-[#553D8A]">AI Enhancement Information</h4>
-                    <p className="text-sm text-gray-600 mt-1">
-                      This character uses advanced AI technology to create unique images in the character's style.
-                      {character.loraStrength !== undefined && (
-                        <span> Default strength: {character.loraStrength.toFixed(1)}</span>
-                      )}
-                    </p>
-                  </div>
-                )}
 
                 {character.isLocked && !userIsAdmin ? (
                   <CustomButton
@@ -154,7 +136,6 @@ export const CharacterDialog = ({ character, onClose, onUnlock, onLoraUploadComp
                 <div className="space-y-2">
                   <h4 className="font-medium text-gray-900">Community Creations</h4>
                   <div className="grid grid-cols-2 gap-4">
-                    {/* Placeholder for community videos */}
                     <div className="aspect-video rounded bg-gray-100"></div>
                     <div className="aspect-video rounded bg-gray-100"></div>
                   </div>
